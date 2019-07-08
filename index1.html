@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html LANG="" dir="">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, minimal-ui=1">
+
+    <title>WebVR Showroom by Little Workshop</title>
+
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <link rel="icon" href="img/favicon.png">
+</head>
+<body>
+<div class="instructions-container">
+    <div class="instructions look" data-ref="look_instructions">
+        <div class="inner">
+            <div class="hand"></div>
+            <div class="copy">Click and drag to look around</div>
+        </div>
+    </div>
+
+    <div class="instructions material" data-ref="material_instructions">
+        <div class="inner">
+            <div class="copy">选择其他材料</div>
+        </div>
+    </div>
+
+    <div class="instructions move" data-ref="move_instructions">
+        <div class="inner">
+            <div class="tap"></div>
+            <div class="copy">点击地板四处移动</div>
+        </div>
+    </div>
+</div>
+
+<div class="loading">
+    <div class="background"></div>
+    <div class="inner">
+        <div class="border" data-ref="border"></div>
+        <div class="panel-container" data-ref="panel_container">
+            <div class="panel" data-ref="panel">
+
+                <div class="main" data-ref="titlescreen_main">
+                    <div class="illustration" data-ref="titlescreen_illustration"></div>
+                    <div class="main-content">
+                        <h1 class="title">WebVR陈列室</h1>
+                        <p class="copy">走进一个内置的虚拟陈列室<strong>WebGL</strong> and <strong>WebVR</strong>. <br/><a href="#about" data-ref="about_link">More info</a></p>
+                        <div class="warning"></div>
+                        <div class="progress" data-ref="progress"><span class="text">载入中</span><span class="percentage">0</span>%</div>
+                        <div class="start" data-ref="start">进入陈列室</div>
+                    </div>
+                </div>
+
+                <div class="about">
+                    <h2 class="title">About</h2>
+                    <div class="copy">
+                        <p>
+                            This is an interior visualization demo. It aims to illustrate how <strong>WebGL</strong> and <strong>WebVR</strong> offer new ways to showcase and customize products on the Web.
+                        </p>
+                        <p>
+                            This demo features physically-based materials to accurately represent surfaces and objects. Since it's running in real-time 3D, you are able to inspect objects from every angle, and even customize their appearance. For the most immersive experience, you can view it in VR in your browser.
+                        </p>
+                        <p>
+                            We created this project from the ground up. All of the following was done by our studio: UX/UI design, 3D modeling and texturing, WebGL and web development.
+                        </p>
+                        <p>
+                            Interested in hiring us to build something awesome? <a href="/cdn-cgi/l/email-protection#5c34393030331c3035282830392b332e372f34332c723a2e"><strong>Get in touch</strong></a>.
+                        </p>
+                    </div>
+                    <div class="close" data-ref="close_about"></div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="about-button" data-ref="about_button"></div>
+
+<canvas id="main_canvas"></canvas>
+
+<script src="js/lib/jquery.min.js"></script>
+<script src="js/lib/jquery.tap.min.js"></script>
+<script src="js/lib/three.min.js"></script>
+<script src="js/main.formater.js"></script>
+
+</body>
+</html>
