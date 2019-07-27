@@ -1,12 +1,14 @@
 import * as THREE  from 'three';
 
+import shaders from 'module/shaders';
+
 import p from 'module/BaseShaderMaterial';
 import 'module/TweenUtils';
 import 'module/LoaderUtils';
 var SeaMaterial = (function (i) {
   i = Object.assign({
-    vertexShader: require('module/SeaMaterialvs'),
-    fragmentShader: require('module/SeaMaterialfs'),
+    vertexShader: shaders['sea.vs'],
+    fragmentShader: shaders['sea.fs'],
     uniforms: {
       diffuse: {
         type: 'c',

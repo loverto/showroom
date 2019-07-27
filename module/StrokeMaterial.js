@@ -1,10 +1,12 @@
 import * as THREE  from 'three';
 
+import shaders from 'module/shaders';
+
 import BaseShaderMaterial from 'module/BaseShaderMaterial';
 var StrokeMaterial = function (name) {
   name = Object.assign({
-    vertexShader: require('module/StrokeMaterialvs'),
-    fragmentShader: require('module/StrokeMaterialfs'),
+    vertexShader: shaders['stroke.vs'],
+    fragmentShader: shaders['stroke.fs'],
     uniforms: {
       diffuse: {
         type: 'c',

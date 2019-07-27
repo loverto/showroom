@@ -1,5 +1,7 @@
 import * as THREE  from 'three';
 
+import shaders from 'module/shaders';
+
 var SeaNoise = function () {
   this.target = new THREE.WebGLRenderTarget(512, 512, {
     minFilter: THREE.NearestFilter,
@@ -8,8 +10,8 @@ var SeaNoise = function () {
   });
   this.target.texture.generateMipmaps = false;
   this.material = new THREE.ShaderMaterial({
-    vertexShader: require('module/SeaNoisevs'),
-    fragmentShader: require('module/SeaNoisefs')
+    vertexShader: shaders['seanoise.vs'],
+    fragmentShader: shaders['seanoise.fs']
   });
   this.scene = new THREE.Scene();
   this.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);

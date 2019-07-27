@@ -1,11 +1,13 @@
 import * as THREE  from 'three';
 
+import shaders from 'module/shaders';
+
 import BaseShaderMaterial from 'module/BaseShaderMaterial';
 import 'module/TweenUtils';
 var TransitionMaterial = (function (options) {
   options = Object.assign({
-    vertexShader: require('module/TransitionMaterialvs'),
-    fragmentShader: require('module/TransitionMaterialfs'),
+    vertexShader: shaders['transition.vs'],
+    fragmentShader: shaders['transition.fs'],
     uniforms: {
       diffuse: {
         type: 'c',
