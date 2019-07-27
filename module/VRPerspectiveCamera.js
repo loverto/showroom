@@ -1,37 +1,55 @@
 import * as THREE from 'three';
 
-import Event from 'module/Event';
+import Event from 'module/Events';
 import VrControl from 'module/VrControl';
 import LookControl from 'module/LookControl';
 import MobileLookControl from 'module/MobileLookControl';
 import OrbitControl from 'module/OrbitControl';
 import Config from 'module/Config';
 
-var ctor = THREE.PerspectiveCamera;
+var THREEPerspectiveCamera = THREE.PerspectiveCamera;
 
+/**
+ * 透视相机
+ * @param options
+ * @constructor
+ */
 var VRPerspectiveCamera = function (options) {
-  ctor.call(this);
+  // 创建相机
+  THREEPerspectiveCamera.call(this);
   this.fov = 50;
+  // 最近
   this.near = 0.01;
+  // 最远
   this.far = 1500;
+  // 更新投影矩阵
   this.updateProjectionMatrix();
+  // 不可移动
   this.moving = false;
+  // 不可旋转
   this.rotating = false;
+  // 如果支持VR，启动VR控制
   if (options.vr) {
     this.vr = true;
     this.vrControls = new VrControl(this);
     this.mode = VRPerspectiveCamera.VR_MODE;
     this.moveTo(0, 0);
   } else {
+    // 不支持VR时，是否为移动设备，如果是移动设备，初始化移动设备的查看控制
     if (window.isMobile) {
       this.lookControls = new MobileLookControl(this, options.canvasElement);
     } else {
+      // PC 设备
       this.lookControls = new LookControl(this, options.$container);
+      // 是否启用阻尼
       if (Config.ENABLE_DAMPING) {
+        // 启用阻尼
         this.lookControls.enableDamping = true;
+        // 阻尼因子
         this.lookControls.dampingFactor = 0.25;
       }
     }
+    // 轨道控制
     this.orbitControls = new OrbitControl(this, {
       autoSpeed: Config.ENABLE_DAMPING ? 0.1 : 1,
       autoDelay: 3000,
@@ -64,7 +82,7 @@ var VRPerspectiveCamera = function (options) {
     }
   }
 };
-VRPerspectiveCamera.inherit(ctor, {
+VRPerspectiveCamera.inherit(THREEPerspectiveCamera, {
   initStates: function (init) {
     this.states = {};
     init.forEach(function (parsed) {

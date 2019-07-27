@@ -1,4 +1,4 @@
-import Event from 'module/Event';
+import Event from 'module/Events';
 var InputManager = function () {
   this.shouldPoll = true;
   this.buttonPressed = null;

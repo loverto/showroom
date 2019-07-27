@@ -2,8 +2,14 @@ import * as THREE  from 'three';
 import 'three/examples/js/controls/OrbitControls';
 import timers from 'module/timers';
 
-function OrbitControl(val, options) {
-  THREE.OrbitControls.call(this, val, options.domElement);
+/**
+ * 轨道控制
+ * @param camera
+ * @param options
+ * @constructor
+ */
+function OrbitControl(camera, options) {
+  THREE.OrbitControls.call(this, camera, options.domElement);
   this.autoSpeed = options.autoSpeed;
   this.autoDelay = options.autoDelay;
   this.autoOrbitTimer = timers.createTimer({

@@ -1,16 +1,22 @@
 import * as THREE from 'three';
 
-import Event from 'module/Event';
-var ScenePicker = function (app) {
-  app = app || {};
+import Event from 'module/Events';
+
+/**
+ * 场景悬旗
+ * @param configOption
+ * @constructor
+ */
+var ScenePicker = function (configOption) {
+  configOption = configOption || {};
   this.objects = [];
   this.mouseCoords = {
     x: 0,
     y: 0
   };
-  this.camera = app.camera;
-  this.vr = app.vr;
-  this.checkFlag = undefined !== app.checkFlag && app.checkFlag;
+  this.camera = configOption.camera;
+  this.vr = configOption.vr;
+  this.checkFlag = undefined !== configOption.checkFlag && configOption.checkFlag;
 };
 ScenePicker.prototype = {
   add: function (value) {

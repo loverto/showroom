@@ -1,14 +1,14 @@
 import * as THREE from 'three';
 
 import BaseSceneManager from 'module/BaseSceneManager';
-import Event from 'module/Event';
+import Event from 'module/Events';
 import LoaderUtils from 'module/LoaderUtils';
 import BaseSphereGeometry from 'module/BaseSphereGeometry';
 import 'module/WebVRUtils';
 import WebVRManager from 'module/WebVRManager';
 import TweenUtils from 'module/TweenUtils';
 import UI from 'module/UI';
-import PanelManager from 'module/PanelManager';
+import Hud from 'module/Hud';
 import PerspectiveCamera from 'module/VRPerspectiveCamera';
 import Water from 'module/Water';
 import InputManager from 'module/InputManager';
@@ -20,10 +20,10 @@ import TransitionMaterial from 'module/TransitionMaterial';
 import Configurables from 'module/Configurables';
 import Config from 'module/Config';
 
-function r(context, f) {
+function flat(scene, pickObject) {
   var folderPathClone = [];
-  context.traverse(function (key) {
-    if (key.name === f) {
+  scene.traverse(function (key) {
+    if (key.name === pickObject) {
       folderPathClone.push(key);
     }
   })
@@ -41,34 +41,57 @@ function negate(c, a, p, e) {
   };
 }
 
+/**
+ * 场景管理
+ * @param data
+ */
 var sceneManager = function (data) {
   BaseSceneManager.call(this, data);
+  // 场景模式标识
   this.mode = data.vr ? sceneManager.VR_MODE : sceneManager.DEFAULT_MODE;
+  // 是否vr显示
   this.vrDisplay = data.vrDisplay;
 };
 sceneManager.inherit(BaseSceneManager, {
+  /**
+   * 初始化
+   */
   init: function () {
     var self = this;
+    // 如果支持VR模式，初始化WebVR
     if (this.mode === sceneManager.VR_MODE) {
       this.initWebVR(this.vrDisplay);
     }
+    // 获取容器
     this.$container = $(document.body);
+    // 更新控制信息
     this.updateContainerInfo();
+    // 设定窗口重置事件
     $(window).on('resize', function () {
       this.updateContainerInfo();
       if (this.mode === sceneManager.DEFAULT_MODE) {
         this.hud.resize();
       }
     }.bind(this));
+    // 开始场景
     this.startScene = this.scenes[0];
+    // 外景
     this.exteriorScene = this.scenes[1];
+    // 室内场景
     this.interiorScene = this.scenes[2];
+    // 进入房间
     this.enteredRoom = false;
+    // 自动清理
     this.renderer.autoClear = false;
+    // 更新世界矩阵
     this.scene.updateMatrixWorld(true);
+    // 初始化材料管理
     this.initMaterialManager();
+    // 初始化相机
     this.initCamera();
+    // 初始化UI
     this.initUI();
+    // 初始化可挑选对象
     this.initObjectPickers();
     this.initObjectsRenderOrder();
     this.initMaterialsExposure();
@@ -347,20 +370,30 @@ sceneManager.inherit(BaseSceneManager, {
     this.containerWidth = this.$container.width();
     this.containerHeight = this.$container.height();
   },
+  /**
+   * 初始化材料管理
+   */
   initMaterialManager: function () {
     this.materialManager = new MaterialManager({
       scenes: this.scenes,
       configurables: Configurables
     });
   },
+  /**
+   * 初始化相机
+   */
   initCamera: function () {
-    var modifier = this.camera = new PerspectiveCamera({
+    // 创建透视相机
+    var perspctiveCamera = this.camera = new PerspectiveCamera({
       vr: this.mode === sceneManager.VR_MODE,
       states: this.scene.getObjectByName('cameras').children,
       $container: this.$container
     });
-    this.scene.add(modifier);
-    modifier.enabled = true;
+    // 场景添加相机
+    this.scene.add(perspctiveCamera);
+    // 相机启动
+    perspctiveCamera.enabled = true;
+    // 如果vr可用的话，设置vr显示
     if (this.mode === sceneManager.VR_MODE) {
       this.camera.vrControls.setVRDisplay(this.vrDisplay);
     }
@@ -390,35 +423,40 @@ sceneManager.inherit(BaseSceneManager, {
    * init对象选择器
    */
   initObjectPickers: function () {
-    var t = [
+    var pickers = [
       'floor',
       'walls',
       'armchairs',
       'colliders'
     ];
     var e = [];
-    Configurables.forEach(function (e) {
-      t.push(e.name);
+    Configurables.forEach(function (configure) {
+      pickers.push(configure.name);
     });
     var self =this ;
-    _.each(t, function (o) {
-      var options = r(self.scene, o);
+
+    _.each(pickers, function (pickObject) {
+      var options = flat(self.scene, pickObject);
       _.each(options, function (spUtils) {
         spUtils.traverse(function (t) {
           e.push(t);
         }.bind(self));
       }, this);
     }, this);
+
     _.each(this.scene.getObjectByName('colliders').children, function (object) {
       object.visible = true;
       object.material.visible = false;
     });
+    // 场景选择
     this.scenePicker = new ScenePicker({
       camera: this.camera,
       checkFlag: true,
       vr: this.mode === sceneManager.VR_MODE
     });
+
     this.scenePicker.add(e);
+    // 皮肤选择
     this.hudPicker = new ScenePicker({
       camera: this.hud.camera,
       checkFlag: true,
@@ -430,6 +468,9 @@ sceneManager.inherit(BaseSceneManager, {
     this.hudPicker.add(this.hud.getPickables());
     this.handlePickerEvents();
   },
+  /**
+   * 处理选择事件
+   */
   handlePickerEvents: function () {
     this.scenePicker.on('pick', function (obj, pos) {
       var node;
@@ -511,6 +552,9 @@ sceneManager.inherit(BaseSceneManager, {
       }
     }, this);
   },
+  /**
+   * 初始化UI
+   */
   initUI: function () {
     this.ui = new UI({
       container: this.$container,
@@ -519,7 +563,8 @@ sceneManager.inherit(BaseSceneManager, {
       configurables: Configurables,
       vr: this.mode === sceneManager.VR_MODE
     });
-    this.hud = new PanelManager({
+    // 皮肤
+    this.hud = new Hud({
       scene: this.scene,
       configurables: Configurables,
       vr: this.mode === sceneManager.VR_MODE

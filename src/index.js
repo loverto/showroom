@@ -14,7 +14,7 @@ var scene;
 var interior2 = 'interior2';
 var exterior2 = 'exterior2';
 var start1 = 'start';
-var id = window.isMobile ? 'assets_mobile/' : 'assets/';
+var resourcePath = window.isMobile ? 'assets_mobile/' : 'assets/';
 var sharing = $('[data-ref="sharing"]');
 var panelContainer = $('[data-ref="panel_container"]');
 var aboutLink = $('[data-ref="about_link"]');
@@ -22,7 +22,7 @@ var closeAbout = $('[data-ref="close_about"]');
 var panel = $('[data-ref="panel"]');
 var border = $('[data-ref="border"]');
 var progress = $('[data-ref="progress"]');
-var start2 = $('[data-ref="start"]');
+var startButton = $('[data-ref="start"]');
 var loading = $('.loading');
 var lodingAndBackground = $('.loading .background');
 var percentage = $('.percentage');
@@ -31,8 +31,8 @@ var aboutButton = $('[data-ref="about_button"]');
 var titlescreenMain = $('[data-ref="titlescreen_main"]');
 var titlescreenIllustration = $('[data-ref="titlescreen_illustration"]');
 var titlescreenFooter = $('[data-ref="titlescreen_footer"]');
-var N = false;
-var B = false;
+var started = false;
+var vrabled = false;
 
 /**
  * 切换车
@@ -74,25 +74,32 @@ function open() {
 
 /**
  * 初始化
- * @param flightPhase
+ * @param vrDisplay
  */
-function init(flightPhase) {
+function init(vrDisplay) {
     scene = new sceneManager({
-        vr: undefined !== flightPhase,
-        vrDisplay: flightPhase,
-        preserveDrawingBuffer: undefined !== flightPhase,
+        vr: undefined !== vrDisplay,
+        vrDisplay: vrDisplay,
+        preserveDrawingBuffer: undefined !== vrDisplay,
         maxPixelRatio: 1.5,
         fps: false,
         logCalls: false
     });
-    scene.renderer.setClearColor(16777215);
+
+    // 0xffffff 16777215 '#ffffff' 白色
+    scene.renderer.setClearColor(0xffffff);
     initialize();
 }
 function render(name) {
-    LoaderUtils.texturePath = id + name + '/';
-    return instance.loadScene(name, id + 'scenes/', scene, message);
+    LoaderUtils.texturePath = resourcePath + name + '/';
+    return instance.loadScene(name, resourcePath + 'scenes/', scene, message);
 }
+
+/**
+ * 初始化
+ */
 function initialize() {
+    // 展示进度条
     progress.show();
     open();
     var options = {
@@ -116,12 +123,14 @@ function initialize() {
         ]
     };
     if (THREE.Extensions.get('EXT_shader_texture_lod')) {
+        // 立方体贴图
         options.cubemaps = ['room/cubemap.bin'];
     } else {
+        // 全景
         options.panoramas = ['room/panorama.bin'];
     }
-    LoaderUtils.environmentPath = id + 'environments';
-    LoaderUtils.geometryPath = id + 'scenes/data/';
+    LoaderUtils.environmentPath = resourcePath + 'environments';
+    LoaderUtils.geometryPath = resourcePath + 'scenes/data/';
     new LoaderManager(options).load().then(function (module) {
         return render(start1);
     }).then(function () {
@@ -131,18 +140,18 @@ function initialize() {
     }).then(function () {
         scene.init();
         _.defer(function () {
-            start2.show();
+            startButton.show();
             progress.hide();
         });
         if (Config.AUTOSTART && !VRenabled) {
-            N = true;
+            started = true;
             start();
             aboutButton.addClass('visible');
         }
     });
 }
 function start() {
-    if (B) {
+    if (vrabled) {
         scene.enterVR();
     }
     scene.start();
@@ -174,11 +183,12 @@ if (VRenabled) {
 } else {
     warning.html('<img src=\'img/missing-headset.png\'>您的浏览器不支持WebVR。<br/>回到非VR模式。');
 }
+// 如果vr可用，获取vr设备列表，只取第一个
 if (VRenabled && navigator.getVRDisplays) {
     navigator.getVRDisplays().then(function (props) {
         if (props.length > 0) {
             init(props[0]);
-            B = true;
+            vrabled = true;
         } else {
             console.error('No VR display');
             warning.html('<img src=\'img/missing-headset.png\'>您的浏览器支持WebVR，但我们无法启动找到您的耳机。回到非VR模式。');
@@ -202,16 +212,17 @@ $('document').ready(function () {
         panelContainer.addClass('state-about');
     });
     closeAbout.on('tap', function () {
-        if (N) {
+        debugger;
+        if (started) {
             toggleCart();
         } else {
             panelContainer.removeClass('state-about');
         }
     });
-    start2.on('tap', function () {
+    startButton.on('tap', function () {
         debugger;
-        if (!N) {
-            N = true;
+        if (!started) {
+            started = true;
             if (VRenabled || window.isMobile) {
                 panel.hide();
                 start();

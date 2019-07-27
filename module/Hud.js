@@ -1,61 +1,95 @@
 import * as THREE  from 'three';
 
-import Event from 'module/Event';
+import Event from 'module/Events';
 import Panel from 'module/Panel';
 import Palette from 'module/Palette';
 import LoaderUtils from 'module/LoaderUtils';
-var PanelManager = function (app) {
+
+/**
+ * 皮肤
+ * @param configOption
+ * @constructor
+ */
+var Hud = function (configOption) {
+  // 场景
   this.scene = new THREE.Scene();
+  // 正交相机
   this.camera = new THREE.OrthographicCamera(window.innerWidth / -2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / -2, -10000, 10000);
+  // 宽
   this.width = this.camera.right - this.camera.left;
+  // 高
   this.height = this.camera.top - this.camera.bottom;
+  // 大小
   this.size = {
     width: this.width,
     height: this.height
   };
+  // 最大比例
   this.maxScale = 0.05 * this.width;
+  // 添加相机
   this.scene.add(this.camera);
+  //设定相机位置
   this.camera.position.set(0, 0, 1000);
+  // 相机查看的位置
   this.camera.lookAt(this.scene.position);
+  // 调色板
   this.palettes = {};
+  // 可挑选的
   this.pickables = [];
-  this.createPalettes(app.scene, app.configurables, app.vr);
+  // 创建调色板
+  this.createPalettes(configOption.scene, configOption.configurables, configOption.vr);
+  // 隐藏调色板
   this.hideAllPalettes();
-  this.createPanels(app.scene, app.configurables, app.vr);
+  // 创建板子
+  this.createPanels(configOption.scene, configOption.configurables, configOption.vr);
+  // 是否可见
   this.visible = false;
 };
-PanelManager.prototype = {
-  createPanels: function (scene, count, cmp) {
-    var r = LoaderUtils.getTexture('textures/corner-gradient.png');
+Hud.prototype = {
+  /**
+   * 创建板子
+   * @param scene
+   * @param configurations
+   * @param isVR
+   */
+  createPanels: function (scene, configurations, isVR) {
+    // 角落渐变
+    var cornerGradient = LoaderUtils.getTexture('textures/corner-gradient.png');
     this.panels = {};
     var self = this;
-    _.each(count, function (p) {
-      var objTemplate = scene.getObjectByName('ui_panel').clone();
+    _.each(configurations, function (configure) {
+      var uiPanel = scene.getObjectByName('ui_panel').clone();
       var panel = new Panel({
-        referenceObject: objTemplate,
-        data: p.panel_data,
+        referenceObject: uiPanel,
+        data: configure.panel_data,
         hudSize: {
           width: self.width,
           height: self.height
         },
-        gradientMap: r,
-        showGradient: !cmp
+        gradientMap: cornerGradient,
+        showGradient: !isVR
       });
       self.scene.add(panel);
       panel.visible = false;
-      self.panels[p.name] = panel;
+      self.panels[configure.name] = panel;
     });
   },
-  createPalettes: function (g, e, islongclick) {
-    e.forEach(function (_ref33) {
-      var name = _ref33.name;
-      var level = g.getObjectByName(name);
+  /**
+   * 创建调色板
+   * @param scene
+   * @param configurations
+   * @param isVR
+   */
+  createPalettes: function (scene, configurations, isVR) {
+    configurations.forEach(function (configure) {
+      var name = configure.name;
+      var level = scene.getObjectByName(name);
       var adjustedLevel = this.getMaterialsForObject(level);
       var palette = new Palette({
         hudSize: this.size,
         maxScale: this.maxScale,
         materials: adjustedLevel,
-        exposureBoost: !islongclick
+        exposureBoost: !isVR
       });
       this.palettes[name] = palette;
       this.scene.add(palette);
@@ -207,5 +241,5 @@ PanelManager.prototype = {
     _.invoke(this.palettes, 'resize', this.size, this.maxScale);
   }
 };
-PanelManager.mixin(Event);
-export default PanelManager;
+Hud.mixin(Event);
+export default Hud;

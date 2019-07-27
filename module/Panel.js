@@ -65,7 +65,6 @@ Panel.inherit(THREE.Object3D, {
     shape.children[0].material.polygonOffsetFactor = -0.1;
   },
   initGradient: function (personLookupResult) {
-    debugger
     var white = new THREE.MeshBasicMaterial({
       transparent: true,
       map: this.gradientMap,
@@ -109,7 +108,6 @@ Panel.inherit(THREE.Object3D, {
     }
   },
   fadeInGradient: function () {
-    debugger
     this.gradient.material.opacity = 0;
     this.gradient.animation.opacity = 0;
     this.gradient.animation.tween.reset(this.gradient.animation).to({ opacity: this.gradient.maxOpacity }, 1000).onUpdate(function () {

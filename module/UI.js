@@ -2,9 +2,13 @@ import * as THREE from 'three';
 
 import LoaderUtils from 'module/LoaderUtils';
 import TweenUtils from 'module/TweenUtils';
-import Event from 'module/Event';
+import Event from 'module/Events';
 import StrokeMaterial from 'module/StrokeMaterial';
-var UI = (window.innerWidth, window.innerHeight, function (options) {
+
+window.innerWidth
+window.innerHeight
+
+var UI = (function (options) {
   this.scene = options.scene;
   this.camera = options.camera;
   this.configurables = options.configurables;
@@ -22,6 +26,9 @@ var UI = (window.innerWidth, window.innerHeight, function (options) {
   }
 });
 UI.prototype = {
+  /**
+   * init VR说明
+   */
   initVRInstructions: function () {
     this.VRMoveInstructions = this.scene.getObjectByName('move_instructions');
     if (this.VRMoveInstructions) {
@@ -36,6 +43,9 @@ UI.prototype = {
       this.camera.add(this.VRConfigureInstructions);
     }
   },
+  /**
+   * 初始化行程
+   */
   initStrokes: function () {
     this.configurables.forEach(function (_ref33) {
       var name = _ref33.name;
@@ -65,6 +75,10 @@ UI.prototype = {
       node.stroke = source;
     }, this);
   },
+  /**
+   * 初始化高亮对象
+   * @param object
+   */
   highlightObject: function (object) {
     object.stroke.visible = true;
     this.currentHighlighted = object;
@@ -78,6 +92,9 @@ UI.prototype = {
       }
     }
   },
+  /**
+   * 清空高亮
+   */
   clearHighlight: function () {
     if (this.currentHighlighted) {
       this.currentHighlighted.stroke.visible = false;
@@ -88,12 +105,21 @@ UI.prototype = {
       this.VRConfigureInstructions.visible = false;
     }
   },
+  /**
+   * 在对象上
+   */
   onEnterObject: function () {
     this.$container.addClass('hovering');
   },
+  /**
+   * 离开对象
+   */
   onLeaveObject: function () {
     this.$container.removeClass('hovering');
   },
+  /**
+   * 初始化水印
+   */
   initMarker: function () {
     this.marker = new THREE.Mesh(new THREE.PlaneGeometry(0.4, 0.4, 1, 1), new THREE.MeshBasicMaterial({
       color: 16777215,
@@ -119,12 +145,22 @@ UI.prototype = {
     this.marker.visible = true;
     this.hideMarker();
   },
+  /**
+   * 冻结标记
+   */
   freezeMarker: function () {
     this.marker.frozen = true;
   },
+  /**
+   * 解冻标记
+   */
   unfreezeMarker: function () {
     this.marker.frozen = false;
   },
+  /**
+   * 更新标记
+   * @param data
+   */
   updateMarker: function (data) {
     if (data) {
       this.marker.position.x = data.x;
@@ -134,6 +170,9 @@ UI.prototype = {
       this.$container.addClass('hovering');
     }
   },
+  /**
+   * 显示标记
+   */
   showMarker: function () {
     this.marker.visible = true;
     this.$container.addClass('hovering');
@@ -141,20 +180,32 @@ UI.prototype = {
       this.VRMoveInstructions.visible = true;
     }
   },
+  /**
+   * 隐藏标记
+   */
   hideMarker: function () {
     this.marker.visible = false;
     this.$container.removeClass('hovering');
   },
+  /**
+   * 淡入标记
+   */
   fadeInMarker: function () {
     this.tweens.marker.reset(this.values).to({ markerOpacity: 1 }, 500).easing(TWEEN.Easing.Quadratic.Out).onUpdate(function () {
       this.marker.material.opacity = this.values.markerOpacity;
     }.bind(this)).start();
   },
+  /**
+   * 淡出标记
+   */
   fadeOutMarker: function () {
     this.tweens.marker.reset(this.values).to({ markerOpacity: 0 }, 300).easing(TWEEN.Easing.Quadratic.Out).onUpdate(function () {
       this.marker.material.opacity = this.values.markerOpacity;
     }.bind(this)).start();
   },
+  /**
+   * 激活标记
+   */
   activateMarker: function () {
     TweenUtils.tween(500, TWEEN.Easing.Quadratic.Out).onUpdate(function (i) {
       this.marker.material.opacity = 0.5 + 0.5 * (1 - i);
@@ -162,9 +213,15 @@ UI.prototype = {
       this.marker.ripple.scale.set(1 + i / 2, 1 + i / 2, 1 + i / 2);
     }.bind(this));
   },
+  /**
+   * 显示材料说明
+   */
   showMaterialInstructions: function () {
     this.$materialInstructions.addClass('visible');
   },
+  /**
+   * 隐藏材料说明
+   */
   hideMaterialInstructions: function () {
     this.$materialInstructions.addClass('fadeout');
     setTimeout(function () {
@@ -172,9 +229,15 @@ UI.prototype = {
       this.$materialInstructions.hide();
     }.bind(this), 500);
   },
+  /**
+   * 显示查看说明
+   */
   showLookInstructions: function () {
     this.$lookInstructions.addClass('visible');
   },
+  /**
+   * 隐藏查看说明
+   */
   hideLookInstructions: function () {
     this.$lookInstructions.addClass('fadeout');
     setTimeout(function () {
@@ -182,15 +245,24 @@ UI.prototype = {
       this.$lookInstructions.hide();
     }.bind(this), 500);
   },
+  /**
+   * 隐藏配置说明
+   */
   hideConfigureInstructions: function () {
     if (this.vr && this.VRConfigureInstructions) {
       this.camera.remove(this.VRConfigureInstructions);
       this.VRConfigureInstructions = null;
     }
   },
+  /**
+   * 显示移动说明
+   */
   showMoveInstructions: function () {
     this.$moveInstructions.addClass('visible');
   },
+  /**
+   * 隐藏移动指令
+   */
   hideMoveInstructions: function () {
     this.$moveInstructions.addClass('fadeout');
     setTimeout(function () {
@@ -202,6 +274,10 @@ UI.prototype = {
       this.VRMoveInstructions = null;
     }
   },
+  /**
+   * 更新
+   * @param type
+   */
   update: function (type) {
     if (!this.marker.frozen) {
       this.updateMarker(type);
