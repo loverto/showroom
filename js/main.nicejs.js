@@ -5446,14 +5446,14 @@
                             } : "undefined" != typeof setTimeout ? function(call) {
                                 setTimeout(call, 0);
                             } : end : function() {
-                                /** @type {!Element} */
+                                /** @type {!UI} */
                                 var div = document.createElement("div");
                                 var observerConfig = {
                                     attributes : true
                                 };
                                 /** @type {boolean} */
                                 var n = false;
-                                /** @type {!Element} */
+                                /** @type {!UI} */
                                 var r = document.createElement("div");
                                 (new MutationObserver(function() {
                                     div.classList.toggle("foo");
@@ -7909,7 +7909,7 @@
                     arrTime = "WebVR supported, but no VRDisplays found.";
                 }
             }) : arrTime = navigator.getVRDevices ? 'Your browser supports WebVR but not the latest version. See <a href="http://webvr.info">webvr.info</a> for more info.' : 'Your browser does not support WebVR. See <a href="http://webvr.info">webvr.info</a> for assistance.', void 0 !== arrTime) {
-                /** @type {!Element} */
+                /** @type {!UI} */
                 var div = document.createElement("div");
                 /** @type {string} */
                 div.style.position = "absolute";
@@ -7923,13 +7923,13 @@
                 div.style.zIndex = "999";
                 /** @type {string} */
                 div.align = "center";
-                /** @type {!Element} */
+                /** @type {!UI} */
                 var el = document.createElement("div");
                 return el.style.fontFamily = "sans-serif", el.style.fontSize = "16px", el.style.fontStyle = "normal", el.style.lineHeight = "26px", el.style.backgroundColor = "#fff", el.style.color = "#000", el.style.padding = "10px 20px", el.style.margin = "50px", el.style.display = "inline-block", el.innerHTML = arrTime, div.appendChild(el), div;
             }
         },
         getButton : function(effect) {
-            /** @type {!Element} */
+            /** @type {!UI} */
             var el = document.createElement("button");
             return el.style.position = "absolute", el.style.left = "calc(50% - 50px)", el.style.bottom = "20px", el.style.width = "100px", el.style.border = "0", el.style.padding = "8px", el.style.cursor = "pointer", el.style.backgroundColor = "#000", el.style.color = "#fff", el.style.fontFamily = "sans-serif", el.style.fontSize = "13px", el.style.fontStyle = "normal", el.style.textAlign = "center", el.style.zIndex = "999", el.textContent = "ENTER VR", el.onclick = function() {
                 if (effect.isPresenting) {
@@ -11415,7 +11415,7 @@
                 }
                 /**
                  * @param {?} res
-                 * @param {(Element|!Function)} v
+                 * @param {(UI|!Function)} v
                  * @return {?}
                  */
                 function item(res, v) {
@@ -16533,7 +16533,7 @@
         captureFrame : function(size, height) {
             this.setSize(size, height);
             this.render();
-            /** @type {(Element|null)} */
+            /** @type {(UI|null)} */
             var canvasDrawBG = document.querySelector("canvas");
             window.open(canvasDrawBG.toDataURL());
         }
@@ -16663,7 +16663,7 @@
         });
         if (this.config.fps) {
             this.fpsCounter = new r;
-            /** @type {!Element} */
+            /** @type {!UI} */
             this.counter = document.createElement("div");
             document.querySelectorAll("body")[0].appendChild(this.counter);
             this.counter.setAttribute("style", "position:absolute;top:20px;left:200px;color:#ff00ff;display:block !important;z-index:999999;");
@@ -18179,7 +18179,7 @@
      * @return {undefined}
      */
     function a() {
-        /** @type {!Element} */
+        /** @type {!UI} */
         canvas = document.createElement("canvas");
         context = canvas.getContext("2d");
     }
@@ -18866,7 +18866,7 @@
      * @return {undefined}
      */
     function init(data, container) {
-        /** @type {(Element|null)} */
+        /** @type {(UI|null)} */
         var context = document.getElementById("main_canvas");
         context.addEventListener("mousemove", this.onMouseMove.bind(this));
         context.addEventListener("mousedown", this.onMouseDown.bind(this));

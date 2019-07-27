@@ -1,0 +1,6 @@
+{
+   "type": "webpack",
+   "knownPaths": {},
+   "entryPoint": 1,
+   "moduleAst": ["body", 0, "expression", "argument", "arguments", 0]
+ }
