@@ -1,3 +1,5 @@
+import * as THREE  from 'three';
+
 var keys = [
   'side',
   'alphaTest',
@@ -6,17 +8,18 @@ var keys = [
   'shading',
   'wireframe'
 ];
-var ShaderMaterialExtern = function (type) {
+var BaseShaderMaterial = function (type) {
+  var self = this
   type = type || {};
   THREE.ShaderMaterial.call(this, type);
   _.each(keys, function (l) {
     var idx = type[l];
-    if (void 0 !== idx) {
-      this[l] = idx;
+    if (undefined !== idx) {
+      self[l] = idx;
     }
-  }, this);
+  });
 };
-ShaderMaterialExtern.inherit(THREE.ShaderMaterial, {
+BaseShaderMaterial.inherit(THREE.ShaderMaterial, {
   onPropertyChange: function (prop, e) {
     Object.defineProperty(this, prop, {
       get: function () {
@@ -29,8 +32,8 @@ ShaderMaterialExtern.inherit(THREE.ShaderMaterial, {
     });
   },
   clone: function (to) {
-    var material = to || new ShaderMaterialExtern();
+    var material = to || new BaseShaderMaterial();
     return THREE.Material.prototype.clone.call(this, material), material.shading = this.shading, material.wireframe = this.wireframe, material.wireframeLinewidth = this.wireframeLinewidth, material.fog = this.fog, material.lights = this.lights, material.vertexColors = this.vertexColors, material.skinning = this.skinning, material.morphTargets = this.morphTargets, material.morphNormals = this.morphNormals, material;
   }
 });
-export default ShaderMaterialExtern;
+export default BaseShaderMaterial;

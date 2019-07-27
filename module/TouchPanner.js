@@ -1,9 +1,11 @@
+import * as THREE from 'three';
+
 import Config from 'module/Config';
 import 'module/Util';
 var speed = (0.25);
 
 function TouchPanner(size) {
-  var target = void 0 !== size ? size : window;
+  var target = undefined !== size ? size : window;
   this.speed = window.innerHeight > window.innerWidth ? speed : 2 * speed;
   window.addEventListener('resize', function () {
     this.speed = window.innerHeight > window.innerWidth ? speed : 2 * speed;

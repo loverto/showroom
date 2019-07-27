@@ -7082,6 +7082,7 @@
                     opacity: .35
                 }), r = new THREE.Geometry;
                 r.vertices.push(new THREE.Vector3);
+                debugger
                 var i = new THREE.Points(r, n);
                 t.getWorldPosition(i.position), this.flares.push(i), this.interiorScene.add(i)
             }, this)

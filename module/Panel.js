@@ -1,3 +1,5 @@
+import * as THREE from 'three';
+
 import CanvasElement from 'module/CanvasElement';
 function setup(name) {
   var obj = new CanvasElement();
@@ -63,6 +65,7 @@ Panel.inherit(THREE.Object3D, {
     shape.children[0].material.polygonOffsetFactor = -0.1;
   },
   initGradient: function (personLookupResult) {
+    debugger
     var white = new THREE.MeshBasicMaterial({
       transparent: true,
       map: this.gradientMap,
@@ -90,7 +93,7 @@ Panel.inherit(THREE.Object3D, {
     this.gradient.position.set(256 - offset / 2, offset / 2 - 256, 0);
   },
   show: function (b) {
-    b = void 0 === b || b;
+    b = undefined === b || b;
     this.visible = true;
     this.innerContainer.visible = true;
     if (b) {
@@ -106,6 +109,7 @@ Panel.inherit(THREE.Object3D, {
     }
   },
   fadeInGradient: function () {
+    debugger
     this.gradient.material.opacity = 0;
     this.gradient.animation.opacity = 0;
     this.gradient.animation.tween.reset(this.gradient.animation).to({ opacity: this.gradient.maxOpacity }, 1000).onUpdate(function () {

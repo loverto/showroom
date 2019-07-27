@@ -1,3 +1,5 @@
+import * as THREE from 'three';
+
 var renderer = [
   'brown_leather',
   'fine_touch_leather 1',
@@ -33,9 +35,9 @@ MaterialManager.prototype = {
     if (size) {
       size.f0Factor = 1;
     }
-    _.each(this.scene.materials, function (exports) {
-      if (exports.pbr) {
-        export const f0Factor = 1;
+    _.each(this.scene.materials, function (material) {
+      if (material.pbr) {
+        material.f0Factor = 1;
       }
     });
     var materialParams = this.getMaterial('sansevieria');

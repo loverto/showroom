@@ -1,9 +1,9 @@
 var WebVRUtils = {
   isLatestAvailable: function () {
-    return void 0 !== navigator.getVRDisplays;
+    return undefined !== navigator.getVRDisplays;
   },
   isAvailable: function () {
-    return void 0 !== navigator.getVRDisplays || void 0 !== navigator.getVRDevices;
+    return undefined !== navigator.getVRDisplays || undefined !== navigator.getVRDevices;
   },
   getMessage: function () {
     var arrTime;
@@ -11,7 +11,7 @@ var WebVRUtils = {
         if (0 === inRevIdx.length) {
           arrTime = 'WebVR supported, but no VRDisplays found.';
         }
-      }) : arrTime = navigator.getVRDevices ? 'Your browser supports WebVR but not the latest version. See <a href="http://webvr.info">webvr.info</a> for more info.' : 'Your browser does not support WebVR. See <a href="http://webvr.info">webvr.info</a> for assistance.', void 0 !== arrTime) {
+      }) : arrTime = navigator.getVRDevices ? 'Your browser supports WebVR but not the latest version. See <a href="http://webvr.info">webvr.info</a> for more info.' : 'Your browser does not support WebVR. See <a href="http://webvr.info">webvr.info</a> for assistance.', undefined !== arrTime) {
       var div = document.createElement('div');
       div.style.position = 'absolute';
       div.style.left = 'LoaderUtils.js';

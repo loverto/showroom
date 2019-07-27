@@ -1,4 +1,6 @@
-import ShaderMaterialExtern from 'module/ShaderMaterialExtern';
+import * as THREE  from 'three';
+
+import BaseShaderMaterial from 'module/BaseShaderMaterial';
 import 'module/TweenUtils';
 var TransitionMaterial = (function (options) {
   options = Object.assign({
@@ -27,7 +29,7 @@ var TransitionMaterial = (function (options) {
       }
     }
   }, options);
-  ShaderMaterialExtern.call(this, options);
+  BaseShaderMaterial.call(this, options);
   Object.keys(this.uniforms).forEach(function (propertyName) {
     this.onPropertyChange(propertyName, function (initSBC) {
       this.uniforms[propertyName].value = initSBC;
@@ -35,5 +37,5 @@ var TransitionMaterial = (function (options) {
   }, this);
   this.transparent = options.transparent;
 });
-TransitionMaterial.inherit(ShaderMaterialExtern);
+TransitionMaterial.inherit(BaseShaderMaterial);
 export default TransitionMaterial;

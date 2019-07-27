@@ -1,4 +1,6 @@
-import p from 'module/ShaderMaterialExtern';
+import * as THREE  from 'three';
+
+import p from 'module/BaseShaderMaterial';
 import 'module/TweenUtils';
 import 'module/LoaderUtils';
 var SeaMaterial = (function (i) {
@@ -49,14 +51,18 @@ var SeaMaterial = (function (i) {
 SeaMaterial.inherit(p, {
   clone: function (params) {
     var data = params || new SeaMaterial();
-    return p.prototype.clone.call(this, data), data.name = this.name, data.transparent = this.transparent, _.each(this.uniforms, function (dom, name) {
+    p.prototype.clone.call(this, data)
+    data.name = this.name
+    data.transparent = this.transparent
+    _.each(this.uniforms, function (dom, name) {
       var value = dom.type;
       if ('v2' === value || 'm4' === value) {
         data.uniforms[name].value.copy(dom.value);
       } else {
         data.uniforms[name].value = dom.value;
       }
-    }, this), data;
+    }, this)
+    return data;
   },
   updateUniforms: function (readBuffer) {
     this.uniforms.threshold.value += 0.35 * readBuffer.delta;

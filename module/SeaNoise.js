@@ -1,3 +1,5 @@
+import * as THREE  from 'three';
+
 var SeaNoise = function () {
   this.target = new THREE.WebGLRenderTarget(512, 512, {
     minFilter: THREE.NearestFilter,

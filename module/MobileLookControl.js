@@ -1,3 +1,5 @@
+import * as THREE from 'three';
+
 import TouchPanner from 'module/TouchPanner';
 
 function MobileLookControl(name, options) {

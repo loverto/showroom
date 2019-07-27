@@ -64,7 +64,13 @@ module.exports = {
                 use: [
                     'file-loader'
                 ]
-            }, {test: /jquery-mousewheel/, loader: "imports-loader?define=>false&this=>window"},
+            },
+            {
+                test: require.resolve('three/examples/js/controls/OrbitControls'),
+                use: 'imports-loader?THREE=three'
+                },
+            {test: /jquery-mousewheel/, loader: "imports-loader?define=>false&this=>window"},
+            {test: /jquery-tap/, loader: "imports-loader?define=>false&this=>window"},
             {
                 test: /\.js$/,
                 exclude: /node_modules/,

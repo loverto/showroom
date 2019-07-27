@@ -1,3 +1,5 @@
+import * as THREE from 'three';
+
 import f from 'module/Mirror';
 var mirrorShader = {
   uniforms: THREE.UniformsUtils.merge([
@@ -99,7 +101,7 @@ var mirrorShader = {
 };
 var WaterMaterial = function (message, config, options) {
   function optionalParameter(value, defaultValue) {
-    return void 0 !== value ? value : defaultValue;
+    return undefined !== value ? value : defaultValue;
   }
   this.clipBias = optionalParameter(options.clipBias, 0);
   this.alpha = optionalParameter(options.alpha, 1);
@@ -144,7 +146,7 @@ WaterMaterial.prototype.updateTextureMatrix = function () {
 };
 WaterMaterial.prototype.update = function () {
   var worldCoordinates = new THREE.Vector3();
-  return function (exports) {
+  return function (data) {
     this.updateMatrixWorld();
     this.camera.updateMatrixWorld();
     worldCoordinates.setFromMatrixPosition(this.camera.matrixWorld);

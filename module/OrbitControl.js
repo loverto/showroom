@@ -1,5 +1,9 @@
+import * as THREE  from 'three';
+import 'three/examples/js/controls/OrbitControls';
+import timers from 'module/timers';
+
 function OrbitControl(val, options) {
-  ThreeOrbitControls.call(this, val, options.domElement);
+  THREE.OrbitControls.call(this, val, options.domElement);
   this.autoSpeed = options.autoSpeed;
   this.autoDelay = options.autoDelay;
   this.autoOrbitTimer = timers.createTimer({
@@ -9,9 +13,8 @@ function OrbitControl(val, options) {
     }.bind(this)
   });
 }
-import ThreeOrbitControls from 'three-orbit-controls';
-import timers from 'module/timers';
-OrbitControl.inherit(ThreeOrbitControls, {
+
+OrbitControl.inherit(THREE.OrbitControls, {
   setTarget: function (e) {
     this.constraint.target.copy(e);
   },
@@ -25,7 +28,7 @@ OrbitControl.inherit(ThreeOrbitControls, {
       this.startTimeout = null;
     }.bind(this);
     this.stopAutoOrbit();
-    if (void 0 !== timeToFadeIn) {
+    if (undefined !== timeToFadeIn) {
       this.startTimeout = setTimeout(tryParseQRCode, timeToFadeIn);
     } else {
       tryParseQRCode();

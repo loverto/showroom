@@ -1,16 +1,16 @@
 
-require('module/null');
-require('module/BaseUtils');
+require('jquery-tap')($);
+import 'module/null';
+import 'module/BaseUtils';
+import Config from 'module/Config';
+import LoaderManager from 'module/LoaderManager';
+import LoaderUtils from 'module/LoaderUtils';
+import instance from 'module/instance';
+import sceneManager from 'module/sceneManager';
+import webVRUtils from 'module/WebVRUtils';
+import message from 'module/jsext';
 
-var Config = require('module/Config');
-var LoaderManager = require('module/LoaderManager');
-var LoaderUtils = require('module/LoaderUtils');
-var instance = require('module/instance');
-var sceneManager = require('module/sceneManager');
-var webVRUtils = require('module/WebVRUtils');
-var message = require('module/jsext');
-
-var app;
+var scene;
 var interior2 = 'interior2';
 var exterior2 = 'exterior2';
 var start1 = 'start';
@@ -77,19 +77,20 @@ function open() {
  * @param flightPhase
  */
 function init(flightPhase) {
-    app = new sceneManager({
-        vr: void 0 !== flightPhase,
+    scene = new sceneManager({
+        vr: undefined !== flightPhase,
         vrDisplay: flightPhase,
-        preserveDrawingBuffer: void 0 !== flightPhase,
+        preserveDrawingBuffer: undefined !== flightPhase,
         maxPixelRatio: 1.5,
         fps: false,
         logCalls: false
     });
-    app.renderer.setClearColor(16777215);
+    scene.renderer.setClearColor(16777215);
     initialize();
 }
 function render(name) {
-    return LoaderUtils.texturePath = id + name + '/', instance.loadScene(name, id + 'scenes/', app, message);
+    LoaderUtils.texturePath = id + name + '/';
+    return instance.loadScene(name, id + 'scenes/', scene, message);
 }
 function initialize() {
     progress.show();
@@ -122,29 +123,29 @@ function initialize() {
     LoaderUtils.environmentPath = id + 'environments';
     LoaderUtils.geometryPath = id + 'scenes/data/';
     new LoaderManager(options).load().then(function (module) {
-        render(start1).then(function () {
-            render(exterior2).then(function () {
-                render(interior2).then(function () {
-                    app.PBRMaterial();
-                    _.defer(function () {
-                        start2.show();
-                        progress.hide();
-                    });
-                    if (Config.AUTOSTART && !VRenabled) {
-                        N = true;
-                        start();
-                        aboutButton.addClass('visible');
-                    }
-                });
-            });
+        return render(start1);
+    }).then(function () {
+        return render(exterior2);
+    }).then(function () {
+        return render(interior2);
+    }).then(function () {
+        scene.init();
+        _.defer(function () {
+            start2.show();
+            progress.hide();
         });
+        if (Config.AUTOSTART && !VRenabled) {
+            N = true;
+            start();
+            aboutButton.addClass('visible');
+        }
     });
 }
 function start() {
     if (B) {
-        app.enterVR();
+        scene.enterVR();
     }
-    app.start();
+    scene.start();
     border.hide();
     loading.addClass('started');
     panelContainer.addClass('state-about in-app');
@@ -229,7 +230,7 @@ $('document').ready(function () {
         aboutButton.removeClass('visible');
         panel.addClass('visible');
     });
-    app.on('closeAbout', function () {
+    scene.on('closeAbout', function () {
         toggleCart();
     });
     panel.on('mouseenter', function () {

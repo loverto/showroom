@@ -1,3 +1,9 @@
+import * as THREE  from 'three';
+
+import o from 'module/Event';
+import that from 'module/timers';
+import r from 'module/FpsCounter';
+
 function update(allOrId) {
   var width = window.WIDTH = window.innerWidth;
   var height = window.HEIGHT = window.innerHeight;
@@ -6,26 +12,26 @@ function update(allOrId) {
 function attachVisibilityEvent(t) {
   var propertyName;
   var visibilityChange;
-  if (void 0 !== document.hidden) {
+  if (undefined !== document.hidden) {
     propertyName = 'hidden';
     visibilityChange = 'visibilitychange';
   } else {
-    if (void 0 !== document.mozHidden) {
+    if (undefined !== document.mozHidden) {
       propertyName = 'mozHidden';
       visibilityChange = 'mozvisibilitychange';
     } else {
-      if (void 0 !== document.msHidden) {
+      if (undefined !== document.msHidden) {
         propertyName = 'msHidden';
         visibilityChange = 'msvisibilitychange';
       } else {
-        if (void 0 !== document.webkitHidden) {
+        if (undefined !== document.webkitHidden) {
           propertyName = 'webkitHidden';
           visibilityChange = 'webkitvisibilitychange';
         }
       }
     }
   }
-  if (void 0 !== document.addEventListener) {
+  if (undefined !== document.addEventListener) {
     document.addEventListener(visibilityChange, function () {
       if (document[propertyName]) {
         t.onLeaveTab();
@@ -37,19 +43,17 @@ function attachVisibilityEvent(t) {
 }
 function Slatebox(_options) {
 }
-import o from 'module/Event';
-import that from 'module/timers';
-import r from 'module/FpsCounter';
+
 var BaseSceneManager = function (options) {
-  if (options = void 0 !== options ? options : {}, this.renderer = new THREE.WebGLRenderer({
+  if (options = undefined !== options ? options : {}, this.renderer = new THREE.WebGLRenderer({
       alpha: true,
       antialias: true,
       canvas: options.canvas || document.querySelector('canvas'),
-      preserveDrawingBuffer: void 0 !== options.preserveDrawingBuffer ? options.preserveDrawingBuffer : void 0
+      preserveDrawingBuffer: undefined !== options.preserveDrawingBuffer ? options.preserveDrawingBuffer : undefined
     }), THREE.Extensions = this.renderer.extensions, this.config = {
-      fps: void 0 !== options.fps && options.fps,
-      profiling: void 0 !== options.profiling && options.profiling,
-      logDrawCalls: void 0 !== options.logDrawCalls && options.logDrawCalls
+      fps: undefined !== options.fps && options.fps,
+      profiling: undefined !== options.profiling && options.profiling,
+      logDrawCalls: undefined !== options.logDrawCalls && options.logDrawCalls
     }, options && options.maxPixelRatio) {
     var ratio = window.devicePixelRatio > options.maxPixelRatio ? options.maxPixelRatio : window.devicePixelRatio;
   } else {
@@ -60,13 +64,13 @@ var BaseSceneManager = function (options) {
   }
   this.renderer.setPixelRatio(ratio);
   this.setSize(options.width || window.innerWidth, options.height || window.innerHeight);
-  if (void 0 !== options.autoClear) {
+  if (undefined !== options.autoClear) {
     this.renderer.autoClear = options.autoClear;
   }
-  if (void 0 !== options.clearColor) {
+  if (undefined !== options.clearColor) {
     this.renderer.setClearColor(options.clearColor);
   }
-  if (!(void 0 !== options.supportsTextureLod && true !== options.supportsTextureLod)) {
+  if (!(undefined !== options.supportsTextureLod && true !== options.supportsTextureLod)) {
     THREE.Extensions.get('EXT_shader_texture_lod');
   }
   this.clock = new THREE.Clock();
@@ -105,20 +109,22 @@ BaseSceneManager.prototype = {
       this.camera.updateMatrixWorld(true);
       this.camera.matrixWorldInverse.getInverse(this.camera.matrixWorld);
     }
+    var self = this;
     _.each(this.scenes, function (child) {
       this.updateCustomMaterials(child);
       if (child.update) {
         child.updateMatrixWorld(true);
-        child.update(this.renderer, time);
+        child.update(self.renderer, time);
       }
-    }, this);
+    });
   },
   updateCustomMaterials: function (scope, tagName) {
+    var self = this
     _.each(scope.materials, function (parent) {
-      if (parent.pbr && (tagName || this.camera)) {
-        parent.refreshUniforms(tagName || this.camera);
+      if (parent.pbr && (tagName || self.camera)) {
+        parent.refreshUniforms(tagName || self.camera);
       }
-    }, this);
+    });
   },
   doUpdate: function () {
     var data = {
@@ -128,7 +134,7 @@ BaseSceneManager.prototype = {
     return function () {
       if (data.delta = this.clock.getDelta(), data.elapsed = this.clock.getElapsedTime(), !this.paused) {
         this.requestAnimationFrame(this.doUpdate.bind(this));
-        var time = void 0 !== window.performance && void 0 !== window.performance.now ? window.performance.now() : Date.now();
+        var time = undefined !== window.performance && undefined !== window.performance.now ? window.performance.now() : Date.now();
         TWEEN.update(time);
         that.updateTimers(data);
         if (this.config.logDrawCalls) {

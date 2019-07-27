@@ -1,3 +1,5 @@
+import * as THREE from 'three';
+
 import LoaderUtils from 'module/LoaderUtils';
 var Palette = function (obj) {
   return THREE.Object3D.call(this), this.strokeMaterial = new THREE.MeshBasicMaterial({
@@ -64,7 +66,7 @@ Palette.inherit(THREE.Object3D, {
   },
   show: function () {
     return function (value) {
-      value = void 0 === value || value;
+      value = undefined === value || value;
       this.children.forEach(function (object) {
         object.material.opacity = 1;
         object.stroke.material.opacity = 1;

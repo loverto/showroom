@@ -1,7 +1,9 @@
+import * as THREE from 'three';
+
 import LoaderUtils from 'module/LoaderUtils';
 import TweenUtils from 'module/TweenUtils';
 import Event from 'module/Event';
-import ColorMaterialProperty from 'module/ColorMaterialProperty';
+import StrokeMaterial from 'module/StrokeMaterial';
 var UI = (window.innerWidth, window.innerHeight, function (options) {
   this.scene = options.scene;
   this.camera = options.camera;
@@ -40,7 +42,7 @@ UI.prototype = {
       var node = this.scene.getObjectByName(name);
       var source = this.scene.getObjectByName(node.name + '_stroke');
       var g = this.scene.getObjectByName('hovergroup_' + name);
-      if (void 0 === source) {
+      if (undefined === source) {
         return void console.warn('Missing stroke mesh for ' + name);
       }
       source.renderOrder = 1;
@@ -58,7 +60,7 @@ UI.prototype = {
       source.position.set(0, 0, 0);
       source.rotation.set(0, 0, 0);
       source.scale.set(1, 1, 1);
-      source.material = new ColorMaterialProperty();
+      source.material = new StrokeMaterial();
       source.material.objectScale = node.scale.x;
       node.stroke = source;
     }, this);

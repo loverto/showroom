@@ -39,7 +39,7 @@ var Events = {
       return this;
     }
     if (!name && !callback && !context) {
-      return this._events = void 0, this;
+      return this._events = undefined, this;
     }
     names = name ? [name] : _.keys(this._events);
     j = 0;

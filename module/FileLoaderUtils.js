@@ -1,56 +1,43 @@
-function empty(src) {
-  var delta = src.slice(0, 27);
-  var v = 1 / (2 * Math.sqrt(Math.PI));
-  var test_6 = -0.5 * Math.sqrt(3 / Math.PI);
-  var $animation = -test_6;
-  var acquireKernelInfoEpic = test_6;
-  var loadConfigEpic = 0.5 * Math.sqrt(15 / Math.PI);
-  var currentRelations = -loadConfigEpic;
-  var c = 0.25 * Math.sqrt(5 / Math.PI);
+import * as THREE from 'three';
+
+/**
+ * 处理光的漫反射/环境光,球谐函数系数
+ * @param jsonData
+ * @returns {number[]}
+ */
+function sphericalHarmonicsCoefficients(jsonData) {
+  // 拷贝元素，从0到26个元素,球谐波离线预计算的系数因子
+  var data = jsonData.slice(0, 27);
+  // 我猜应该是9个系数
+  // 通过预先计算出的常数来优化漫反射
+  // 伴随勒让德多项式 常量
+  var a = 1 / (2 * Math.sqrt(Math.PI));
+  var e = -(.5 * Math.sqrt(3 / Math.PI));
+  var i = -e;
+  var abcd = e;
+  var knobHalf = .5 * Math.sqrt(15 / Math.PI);
+  var currentRelations = -knobHalf;
+  var c = .25 * Math.sqrt(5 / Math.PI);
   var addedRelations = currentRelations;
-  var l = 0.25 * Math.sqrt(15 / Math.PI);
-  return [
-    v,
-    v,
-    v,
-    test_6,
-    test_6,
-    test_6,
-    $animation,
-    $animation,
-    $animation,
-    acquireKernelInfoEpic,
-    acquireKernelInfoEpic,
-    acquireKernelInfoEpic,
-    loadConfigEpic,
-    loadConfigEpic,
-    loadConfigEpic,
-    currentRelations,
-    currentRelations,
-    currentRelations,
-    c,
-    c,
-    c,
-    addedRelations,
-    addedRelations,
-    addedRelations,
-    l,
-    l,
-    l
-  ].map(function (position, i) {
-    return position * delta[i];
+  var l = .25 * Math.sqrt(15 / Math.PI);
+  var array = [a, a, a, e, e, e, i, i, i, abcd, abcd, abcd, knobHalf, knobHalf, knobHalf, currentRelations, currentRelations, currentRelations, c, c, c, addedRelations, addedRelations, addedRelations, l, l, l];
+  return array.map(function(position, i) {
+    return position * data[i];
   });
 }
-var FileLoaderUtils = function (size) {
-  THREE.XHRLoader.call(this);
-  this.manager = void 0 !== size ? size : THREE.DefaultLoadingManager;
+
+function FileLoaderUtils(data) {
+  THREE.FileLoader.call(this);
+  this.manager = undefined !== data ? data : THREE.DefaultLoadingManager;
 };
-FileLoaderUtils.prototype = Object.create(THREE.XHRLoader.prototype);
-FileLoaderUtils.prototype.load = function (fileName, err, tree, url) {
-  THREE.XHRLoader.prototype.load.call(this, fileName, function (manifest) {
-    var list = JSON.parse(manifest);
-    var result = empty(list);
-    err(result);
-  }, tree, url);
+FileLoaderUtils.prototype = Object.create(THREE.FileLoader.prototype);
+
+FileLoaderUtils.prototype.load = function(url, loadCallback, onProgress, onError) {
+  THREE.FileLoader.prototype.load.call(this, url, function(data) {
+    var jsonData = JSON.parse(data);
+    var x = sphericalHarmonicsCoefficients(jsonData);
+    loadCallback(x);
+  }, onProgress, onError);
 };
-export default FileLoaderUtils;
+
+export default FileLoaderUtils

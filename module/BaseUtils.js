@@ -1,31 +1,56 @@
-import '@tweenjs/tween.js';
+window.TWEEN = '@tweenjs/tween.js';
 window._ = require('lodash');
-Number.prototype.lerp = function (minIn, maxIn) {
+
+TWEEN.Tween.prototype.reset = function(value) {
+  return new TWEEN.Tween(value);
+};
+
+/**
+ * 线性插值
+ * @param minIn
+ * @param maxIn
+ * @returns {number}
+ */
+Number.prototype.lerp = function(minIn, maxIn) {
   return this + (minIn - this) * maxIn;
 };
+// 给String 扩展endsWith方法
 if (!String.prototype.endsWith) {
-  String.prototype.endsWith = function (prefix, i) {
-    var result = this.toString();
-    if ('number' != typeof i || !isFinite(i) || Math.floor(i) !== i || i > result.length) {
-      i = result.length;
+
+  String.prototype.endsWith = function(value, offset) {
+    var buffer = this.toString();
+    if ('number' != typeof offset || !isFinite(offset) || Math.floor(offset) !== offset || offset > buffer.length) {
+      offset = buffer.length;
     }
-    i = i - prefix.length;
-    var src = result.indexOf(prefix, i);
-    return -1 !== src && src === i;
+    offset = offset - value.length;
+    var count = buffer.indexOf(value, offset);
+    return count !== -1 && count === offset;
   };
 }
-Function.prototype.inherit = function (parent, obj) {
-  if (!parent || !_.isFunction(parent)) {
+
+/**
+ * 给函数扩展继承办法
+ * @param target
+ * @param obj
+ */
+Function.prototype.inherit = function(target, obj) {
+  if (!target || !_.isFunction(target)) {
     throw 'parent argument must be a function';
   }
-  this.prototype = _.extend(Object.create(parent.prototype), obj);
+  this.prototype = _.extend(Object.create(target.prototype), obj);
 };
-Function.prototype.mixin = function (obj) {
-  _.each(obj, function (require, methodName) {
-    if (void 0 === this.prototype[methodName]) {
-      this.prototype[methodName] = require;
+
+/**
+ * 混入
+ * @param name
+ */
+Function.prototype.mixin = function(name) {
+  var self = this;
+  _.each(name, function(fn, methodName) {
+    if (undefined === self.prototype[methodName]) {
+      self.prototype[methodName] = fn;
     }
-  }, this);
+  });
 };
 window.WIDTH = window.innerWidth;
 window.HEIGHT = window.innerHeight;

@@ -1,138 +1,292 @@
-import bluebird from 'bluebird';
-import require from 'module/parseUrl';
-import ImageLoader from 'module/LoadSceneManager';
-import Big from 'module/DataTextureLoaderExtern';
-import List from 'module/CompressedTextureLoaderExtern';
-import Type from 'module/FileLoaderUtils';
-import Connection from 'module/FileLoaderExtern';
+import * as THREE from 'three';
 
-function normalize(tree, p) {
+// promise 工具类
+import bluebird from 'bluebird';
+
+import parseUrl from 'module/parseUrl';
+import LoadSceneManager from 'module/LoadSceneManager';
+import BaseDataTextureLoader from 'module/BaseDataTextureLoader';
+import AbstrctCompressedTextureLoader from 'module/AbstrctCompressedTextureLoader';
+import FileLoaderUtils from 'module/FileLoaderUtils';
+import BaseFileLoader from 'module/BaseFileLoader';
+// 加载管理
+var loadingManager = new THREE.LoadingManager;
+// 场景加载管理
+var loadSceneManager = new LoadSceneManager(loadingManager);
+var cacheResult = {};
+// 标准化纹理加载器
+var textureLoaderNoralize = normalize(new THREE.TextureLoader(loadingManager), cacheResult);
+// 标准化数据纹理加载器
+var dataTextureLoaderExternNoralize = normalize(new BaseDataTextureLoader(1024, false, loadingManager), cacheResult);
+// 标准化压缩纹理加载器
+var compressedTextureLoaderExternNoralize = normalize(new AbstrctCompressedTextureLoader(256, false, loadingManager), cacheResult);
+// sh 的
+var shs = {};
+// 数据帧渲染
+var dataFrameReader = new FileLoaderUtils(loadingManager);
+var geometriesCache = {};
+// 标准化文件加载器
+var geometries = normalize(new BaseFileLoader(loadingManager), geometriesCache);
+var LoaderUtils = {
+  environmentPath : 'assets/environments',
+  geometryPath : 'assets/scenes/data/',
+  manager : loadingManager,
+  sceneLoader : loadSceneManager
+};
+
+/**
+ * 把load格式标准化
+ * @param loader
+ * @param cacheResult
+ * @returns {{load: load, get: (function(*=)), _cache: (*|{})}}
+ */
+function normalize(loader, cacheResult) {
   return {
-    _cache: p || {},
-    load: function (f, m, key, options, path) {
+    /**
+     * 缓存
+     */
+    _cache : cacheResult || {},
+    /**
+     * 用加载器加载数据
+     * @param url
+     * @param m
+     * @param onProgress
+     * @param onError
+     * @param path
+     */
+    load : function(url, m, onProgress, onError, path) {
+      // 获取当前的缓存
       var cache = this._cache;
+      // 判断缓存中是否有该元素
       if (_.has(cache, path)) {
         resolve(cache[path]);
       } else {
-        tree.load(f, function (tmpl) {
+        loader.load(url, function(tmpl) {
           cache[path] = tmpl;
           m.apply(this, arguments);
-        }, key, options);
+        }, onProgress, onError);
       }
     },
-    get: function (type) {
-      return _.has(this._cache, type) || console.error('Resource not found: ' + type), this._cache[type];
+    /**
+     * 读取元素
+     * @param path
+     * @returns {*}
+     */
+    get : function(path) {
+      // 从缓存中读取内容
+      if(!_.has(this._cache, path)){
+        console.error('Resource not found: ' + path)
+      }
+      return this._cache[path];
     }
   };
 }
-function exec(nodes, val, dst, callback) {
-  console.log(_);
-  return _.isArray(nodes) || (nodes = [nodes]), bluebird.all(_.map(nodes, function (ext) {
-    if (callback) {
-      return callback(require(val, ext), ext, dst);
+
+/**
+ *
+ * @param resources 资源数组或资源
+ * @param uri 服务器路径 示例 http:// | ftp:// | https
+ * @param normalizeLoader 规范化之后的加载器
+ * @param load 加载
+ * @returns {Promise<[any, any, any, any, any, any, any, any, any, any]>}
+ */
+function exec(resources, uri, normalizeLoader, load) {
+  // 如果参数不是数组，自动转换为数组
+  _.isArray(resources) || (resources = [resources])
+  return  bluebird.all(_.map(resources, function(uriResource) {
+    if (load) {
+      return load(parseUrl(uri, uriResource), uriResource, normalizeLoader);
     }
   }));
 }
-function load(url, name, type) {
-  return new bluebird(function (i, stepCallback) {
-    type.load(url, function (t) {
-      t.filename = name;
-      i(arguments.length > 1 ? _.toArray(arguments) : t);
-    }, function () {
-    }, function () {
-      stepCallback(new Error('Resource was not found: ' + url));
+
+/**
+ * 加载
+ * @param url 加载路径
+ * @param name web资源
+ * @param loader 规范化之后的加载器
+ * @returns {Promise}
+ */
+function load(url, name, loader) {
+  return new bluebird(function(resolve, reject) {
+    loader.load(url, function(object) {
+      // 文件名称赋值
+      object.filename = name;
+      resolve(arguments.length > 1 ? _.toArray(arguments) : object);
+    }, function() {
+    }, function() {
+      reject(new Error('Resource was not found: ' + url));
     }, name);
   });
 }
-function callback(e, b, a) {
-  console.log(e, b, a);
-  return e = e || [], exec(e, b, a, load);
+
+/**
+ *
+ * @param resourcesArray 资源数组
+ * @param uri 服务器路径 示例 http:// | ftp://| https://
+ * @param normalizeLoader 规范化之后的loader 加载器
+ */
+function fn(resourcesArray, uri, normalizeLoader) {
+  // 如果arrays未定义，则初始化空数组
+  resourcesArray = resourcesArray || []
+  return exec(resourcesArray, uri, normalizeLoader, load);
 }
 
-var manager = new THREE.LoadingManager();
-var loader = new ImageLoader(manager);
-var v = {};
-var res = normalize(new THREE.TextureLoader(manager), v);
-var y = normalize(new Big(1024, false, manager), v);
-var val = normalize(new List(256, false, manager), v);
-var err = normalize(new THREE.ImageLoader());
-var annotationStarts = {};
-var scope = new Type(manager);
-var p1 = {};
-var c = normalize(new Connection(manager), p1);
-var self = {
-  environmentPath: 'assets/environments',
-  geometryPath: 'assets/scenes/data/',
-  manager: manager,
-  sceneLoader: loader
-};
-var pathMatch = '';
-Object.defineProperty(self, 'texturePath', {
-  get: function () {
-    return pathMatch;
+// 定义纹理路径
+var temp = '';
+Object.defineProperty(LoaderUtils, 'texturePath', {
+  get : function() {
+    return temp;
   },
-  set: function (p) {
-    pathMatch = p;
-    loader.setTexturePath(p);
+  set : function(dir) {
+    temp = dir;
+    loadSceneManager.setTexturePath(dir);
   }
 });
-self.loadScene = function (url, key) {
-  return load(url, key, loader);
+
+/**
+ * 场景加载
+ * @param url 资源路径
+ * @param filename 文件名称
+ * @returns {Promise}
+ */
+LoaderUtils.loadScene = function(url, filename) {
+  return load(url, filename, loadSceneManager);
 };
-self.loadOBJs = function (t, i) {
-  return callback(t, i, objLoader);
+
+/**
+ * 加載Objs對象
+ * @param objsArray objs资源数组
+ * @param uri 服务器路径 示例 http:// | ftp://| https://
+ * @returns {Promise<(any)[]>}
+ */
+LoaderUtils.loadOBJs = function(resourceArray, url) {
+  return fn(resourceArray, url, objLoader);
 };
-self.loadTextures = function (selected, options) {
-  return callback(selected, options || self.texturePath, res);
+/**
+ * 加载纹理
+ * @param texturesArrays 纹理资源数组
+ * @param uri 服务器路径 示例 http:// | ftp://| https://
+ * @returns {?}
+ */
+LoaderUtils.loadTextures = function(texturesArrays, uri) {
+  return fn(texturesArrays, uri || LoaderUtils.texturePath, textureLoaderNoralize);
 };
-self.loadBRDFs = function (t, i) {
-  return callback(t, i, brdfLoader);
+
+/**
+ *
+ * @param brdfsArray brdf资源数组
+ * @param uri 服务器路径 示例 http:// | ftp://| https://
+ * @returns {Promise<(any)[]>}
+ */
+LoaderUtils.loadBRDFs = function(brdfsArray, uri) {
+  return fn(brdfsArray, uri, brdfLoader);
 };
-self.loadPanoramas = function (id, port) {
-  return callback(id, port || self.environmentPath, y);
+
+/**
+ * 加载全景资源数组
+ * @param panoramasArray 全景资源数组
+ * @param uri 服务器路径 示例 http:// | ftp://| https://
+ * @returns {Promise<(any)[]>}
+ */
+LoaderUtils.loadPanoramas = function(panoramasArray, uri) {
+  return fn(panoramasArray, uri || LoaderUtils.environmentPath, dataTextureLoaderExternNoralize);
 };
-self.loadSpecularCubemaps = function (id, port) {
-  console.log(id, port);
-  return callback(id, port || self.environmentPath, val);
+
+/**
+ * 加载光斑
+ * @param specularCubemapsArray 光斑资源数组
+ * @param uri 服务器路径 示例 http:// | ftp://| https://
+ * @returns {Promise<(any)[]>}
+ */
+LoaderUtils.loadSpecularCubemaps = function(specularCubemapsArray, uri) {
+  return fn(specularCubemapsArray, uri || LoaderUtils.environmentPath, compressedTextureLoaderExternNoralize);
 };
-self.loadSH = function (fn) {
-  return bluebird.all(_.map(fn, function (name) {
-    return new bluebird(function (e, stepCallback) {
-      var r = require(self.environmentPath, name + '/irradiance.json');
-      scope.load(r, function (n) {
-        annotationStarts[name] = n;
-        e(n);
-      }, function () {
-      }, function () {
-        stepCallback(new Error('Resource was not found: ' + r));
+
+/**
+ * 加载Sh
+ * @param env
+ * @returns {Promise<[any, any, any, any, any, any, any, any, any, any]>}
+ */
+LoaderUtils.loadSH = function(env) {
+  return bluebird.all(_.map(env, function(item) {
+    return new bluebird(function(resolve, reject) {
+      // 辐照度
+      var url = parseUrl(LoaderUtils.environmentPath, item + '/irradiance.json');
+      // 加载json文件
+      dataFrameReader.load(url, function(data) {
+        shs[item] = data;
+        resolve(data);
+      }, function() {
+      }, function() {
+        reject(new Error('Resource was not found: ' + url));
       });
     });
   }));
 };
-self.loadGeometries = function (e, value) {
-  return e = _.map(e, function (exports) {
-    return exports + '.bin';
-  }), callback(e, value || self.geometryPath, c);
+
+/**
+ * 加载几何体
+ * @param geometriesArray 几何体数组
+ * @param uri  服务器路径 示例 http:// | ftp://| https://
+ */
+LoaderUtils.loadGeometries = function(geometriesArray, uri) {
+  return geometriesArray = _.map(geometriesArray, function(item) {
+    return item + '.bin';
+  }), fn(geometriesArray, uri || LoaderUtils.geometryPath, geometries);
 };
-self.loadImages = function (next, id) {
-  return callback(next, id, err);
+
+/**
+ * 根据key获取纹理
+ * @param key
+ * @returns {*}
+ */
+LoaderUtils.getTexture = function(key) {
+  return textureLoaderNoralize.get(key);
 };
-self.getTexture = function (key) {
-  return res.get(key);
-};
-self.getBRDF = function (t) {
+
+/**
+ * 根据key 获取brdf
+ * @param t
+ * @returns {*}
+ */
+LoaderUtils.getBRDF = function(t) {
   return brdfLoader.get(t);
 };
-self.getPanorama = function (i) {
-  return y.get(i + '/panorama.bin');
+
+/**
+ * 根据key获取全景
+ * @param prefix
+ * @returns {*}
+ */
+LoaderUtils.getPanorama = function(prefix) {
+  return dataTextureLoaderExternNoralize.get(prefix + '/panorama.bin');
 };
-self.getCubemap = function (i) {
-  return val.get(i + '/cubemap.bin');
+
+/**
+ * 根据key获取立方体
+ * @param prefix
+ * @returns {*}
+ */
+LoaderUtils.getCubemap = function(prefix) {
+  return compressedTextureLoaderExternNoralize.get(prefix + '/cubemap.bin');
 };
-self.getSH = function (name) {
-  return annotationStarts[name];
+
+/**
+ * 根据key 获取SH Spherical Harmonics，球面谐波
+ * @param notebookID
+ * @returns {*}
+ */
+LoaderUtils.getSH = function(notebookID) {
+  return shs[notebookID];
 };
-self.getGeometry = function (name) {
-  return c.get(name + '.bin');
+
+/**
+ * 根据key获取几何体
+ * @param name
+ * @returns {*}
+ */
+LoaderUtils.getGeometry = function(name) {
+  return geometries.get(name + '.bin');
 };
-export default self;
+export default LoaderUtils;

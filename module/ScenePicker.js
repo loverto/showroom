@@ -1,3 +1,5 @@
+import * as THREE from 'three';
+
 import Event from 'module/Event';
 var ScenePicker = function (app) {
   app = app || {};
@@ -8,15 +10,16 @@ var ScenePicker = function (app) {
   };
   this.camera = app.camera;
   this.vr = app.vr;
-  this.checkFlag = void 0 !== app.checkFlag && app.checkFlag;
+  this.checkFlag = undefined !== app.checkFlag && app.checkFlag;
 };
 ScenePicker.prototype = {
   add: function (value) {
     if (!_.isArray(value)) {
       value = [value];
     }
+    var self = this
     _.each(value, function (obj) {
-      this.objects.push(obj);
+      self.objects.push(obj);
       obj.pickable = true;
     }, this);
   },
@@ -48,10 +51,10 @@ ScenePicker.prototype = {
     var camera = new THREE.Vector3();
     var node = new THREE.Vector3();
     new THREE.Vector3();
-    return function (exports) {
+    return function (vr) {
       var name;
       this.camera.getWorldPosition(node);
-      if (this.vr || exports) {
+      if (this.vr || vr) {
         this.camera.getWorldDirection(camera);
         raycaster.set(node, camera);
       } else {
@@ -60,7 +63,7 @@ ScenePicker.prototype = {
       var template = raycaster.intersectObjects(this.objects);
       if (template.length > 0) {
         var options = _.find(template, function (typeStatement) {
-          return this.checkFlag ? void 0 !== typeStatement.object.pickable && true === typeStatement.object.pickable : typeStatement.object;
+          return this.checkFlag ? undefined !== typeStatement.object.pickable && true === typeStatement.object.pickable : typeStatement.object;
         }, this);
         if (options) {
           this.point = options.point;

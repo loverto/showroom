@@ -1,8 +1,10 @@
-import ShaderMaterialExtern from 'module/ShaderMaterialExtern';
-var ColorMaterialProperty = function (name) {
+import * as THREE  from 'three';
+
+import BaseShaderMaterial from 'module/BaseShaderMaterial';
+var StrokeMaterial = function (name) {
   name = Object.assign({
-    vertexShader: require('module/ColorMaterialPropertyvs'),
-    fragmentShader: require('module/ColorMaterialPropertyfs'),
+    vertexShader: require('module/StrokeMaterialvs'),
+    fragmentShader: require('module/StrokeMaterialfs'),
     uniforms: {
       diffuse: {
         type: 'c',
@@ -18,7 +20,7 @@ var ColorMaterialProperty = function (name) {
       }
     }
   }, name);
-  ShaderMaterialExtern.call(this, name);
+  BaseShaderMaterial.call(this, name);
   Object.keys(this.uniforms).forEach(function (propertyName) {
     this.onPropertyChange(propertyName, function (initSBC) {
       this.uniforms[propertyName].value = initSBC;
@@ -26,17 +28,21 @@ var ColorMaterialProperty = function (name) {
   }, this);
   this.depthWrite = false;
 };
-ColorMaterialProperty.inherit(ShaderMaterialExtern, {
+StrokeMaterial.inherit(BaseShaderMaterial, {
   clone: function (params) {
-    var data = params || new ColorMaterialProperty();
-    return ShaderMaterialExtern.prototype.clone.call(this, data), data.name = this.name, data.transparent = this.transparent, _.each(this.uniforms, function (dom, name) {
+    var data = params || new StrokeMaterial();
+    BaseShaderMaterial.prototype.clone.call(this, data)
+    data.name = this.name
+    data.transparent = this.transparent
+    _.each(this.uniforms, function (dom, name) {
       var value = dom.type;
       if ('v2' === value || 'm4' === value) {
         data.uniforms[name].value.copy(dom.value);
       } else {
         data.uniforms[name].value = dom.value;
       }
-    }, this), data;
+    }, this)
+    return data;
   }
 });
-export default ColorMaterialProperty;
+export default StrokeMaterial;

@@ -1,10 +1,14 @@
-var ctor = THREE.PerspectiveCamera;
+import * as THREE from 'three';
+
 import Event from 'module/Event';
 import VrControl from 'module/VrControl';
 import LookControl from 'module/LookControl';
 import MobileLookControl from 'module/MobileLookControl';
 import OrbitControl from 'module/OrbitControl';
 import Config from 'module/Config';
+
+var ctor = THREE.PerspectiveCamera;
+
 var VRPerspectiveCamera = function (options) {
   ctor.call(this);
   this.fov = 50;
@@ -78,7 +82,7 @@ VRPerspectiveCamera.inherit(ctor, {
   },
   setState: function (index) {
     if (!this.vr) {
-      if (void 0 === index) {
+      if (undefined === index) {
         return void console.warn('setCameraState() requires an argument');
       }
       if (!this.states.hasOwnProperty(index)) {

@@ -1,3 +1,5 @@
+import * as THREE  from 'three';
+
 function LookControl(data, container) {
   var module = document.getElementById('main_canvas');
   module.addEventListener('mousemove', this.onMouseMove.bind(this));
@@ -66,7 +68,7 @@ LookControl.prototype = {
     this.$container.removeClass('rotating');
   },
   isPointerLocked: function () {
-    return void 0 !== (document.pointerLockElement || document.mozPointerLockElement || document.webkitPointerLockElement);
+    return undefined !== (document.pointerLockElement || document.mozPointerLockElement || document.webkitPointerLockElement);
   }
 };
 export default LookControl;

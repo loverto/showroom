@@ -1,3 +1,5 @@
+import * as THREE  from 'three';
+
 var WebVRManager = function (renderer, e) {
   function callback(displays) {
     vrDisplays = displays;
@@ -11,7 +13,7 @@ var WebVRManager = function (renderer, e) {
   }
   function onVRDisplayPresentChange() {
     var wasPresenting = scope.isPresenting;
-    if (scope.isPresenting = void 0 !== vrDisplay && vrDisplay.isPresenting, scope.isPresenting) {
+    if (scope.isPresenting = undefined !== vrDisplay && vrDisplay.isPresenting, scope.isPresenting) {
       var eyeParamsL = vrDisplay.getEyeParameters('left');
       var eyeWidth = eyeParamsL.renderWidth;
       var eyeHeight = eyeParamsL.renderHeight;
@@ -70,9 +72,9 @@ var WebVRManager = function (renderer, e) {
    * @param zFar
    */
   function fovPortToProjection(fov, rightHanded, zNear, zFar) {
-    rightHanded = void 0 === rightHanded || rightHanded;
-    zNear = void 0 === zNear ? 0.01 : zNear;
-    zFar = void 0 === zFar ? 10000 : zFar;
+    rightHanded = undefined === rightHanded || rightHanded;
+    zNear = undefined === zNear ? 0.01 : zNear;
+    zFar = undefined === zFar ? 10000 : zFar;
     var handednessScale = rightHanded ? -1 : 1;
     var matrix = new THREE.Matrix4();
     var m = matrix.elements;
@@ -158,7 +160,7 @@ var WebVRManager = function (renderer, e) {
   window.addEventListener('vrdisplaypresentchange', onVRDisplayPresentChange, false);
   this.setFullScreen = function (boolean) {
     return new Promise(function (resolve, reject) {
-      return void 0 === vrDisplay ? void reject(new Error('No VR hardware found.')) : scope.isPresenting === boolean ? void resolve() : void resolve(boolean ? vrDisplay.requestPresent([{ source: d }]) : vrDisplay.exitPresent());
+      return undefined === vrDisplay ? void reject(new Error('No VR hardware found.')) : scope.isPresenting === boolean ? void resolve() : void resolve(boolean ? vrDisplay.requestPresent([{ source: d }]) : vrDisplay.exitPresent());
     });
   };
   this.requestPresent = function () {
@@ -168,17 +170,17 @@ var WebVRManager = function (renderer, e) {
     return this.setFullScreen(false);
   };
   this.requestAnimationFrame = function (cb) {
-    return void 0 !== vrDisplay ? vrDisplay.requestAnimationFrame(cb) : window.requestAnimationFrame(cb);
+    return undefined !== vrDisplay ? vrDisplay.requestAnimationFrame(cb) : window.requestAnimationFrame(cb);
   };
   this.cancelAnimationFrame = function (h) {
-    if (void 0 !== vrDisplay) {
+    if (undefined !== vrDisplay) {
       vrDisplay.cancelAnimationFrame(h);
     } else {
       window.cancelAnimationFrame(h);
     }
   };
   this.submitFrame = function () {
-    if (void 0 !== vrDisplay && scope.isPresenting) {
+    if (undefined !== vrDisplay && scope.isPresenting) {
       vrDisplay.submitFrame();
     }
   };

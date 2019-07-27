@@ -1,3 +1,5 @@
+import * as THREE from 'three';
+
 var VrControl = function (object, onError) {
   function callback(displays) {
     vrDisplays = displays;

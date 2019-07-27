@@ -1,7 +1,9 @@
+import * as THREE from 'three';
+
 import BaseSceneManager from 'module/BaseSceneManager';
 import Event from 'module/Event';
 import LoaderUtils from 'module/LoaderUtils';
-import SphereGeometryExtern from 'module/SphereGeometryExtern';
+import BaseSphereGeometry from 'module/BaseSphereGeometry';
 import 'module/WebVRUtils';
 import WebVRManager from 'module/WebVRManager';
 import TweenUtils from 'module/TweenUtils';
@@ -16,14 +18,16 @@ import SeaMaterial from 'module/SeaMaterial';
 import SeaNoise from 'module/SeaNoise';
 import TransitionMaterial from 'module/TransitionMaterial';
 import Configurables from 'module/Configurables';
+import Config from 'module/Config';
 
 function r(context, f) {
   var folderPathClone = [];
-  return context.traverse(function (key) {
+  context.traverse(function (key) {
     if (key.name === f) {
       folderPathClone.push(key);
     }
-  }), folderPathClone;
+  })
+  return folderPathClone;
 }
 function isString(object) {
   return _.contains(_.map(Configurables, function (engineDiscovery) {
@@ -37,13 +41,14 @@ function negate(c, a, p, e) {
   };
 }
 
-var sceneManager = function (app) {
-  BaseSceneManager.call(this, app);
-  this.mode = app.vr ? sceneManager.VR_MODE : sceneManager.DEFAULT_MODE;
-  this.vrDisplay = app.vrDisplay;
+var sceneManager = function (data) {
+  BaseSceneManager.call(this, data);
+  this.mode = data.vr ? sceneManager.VR_MODE : sceneManager.DEFAULT_MODE;
+  this.vrDisplay = data.vrDisplay;
 };
 sceneManager.inherit(BaseSceneManager, {
   init: function () {
+    var self = this;
     if (this.mode === sceneManager.VR_MODE) {
       this.initWebVR(this.vrDisplay);
     }
@@ -381,6 +386,9 @@ sceneManager.inherit(BaseSceneManager, {
       this.transitionQuad.material.opacity = 1 - i;
     }.bind(this));
   },
+  /**
+   * init对象选择器
+   */
   initObjectPickers: function () {
     var t = [
       'floor',
@@ -392,12 +400,13 @@ sceneManager.inherit(BaseSceneManager, {
     Configurables.forEach(function (e) {
       t.push(e.name);
     });
+    var self =this ;
     _.each(t, function (o) {
-      var options = r(this.scene, o);
+      var options = r(self.scene, o);
       _.each(options, function (spUtils) {
         spUtils.traverse(function (t) {
           e.push(t);
-        }.bind(this));
+        }.bind(self));
       }, this);
     }, this);
     _.each(this.scene.getObjectByName('colliders').children, function (object) {
@@ -588,12 +597,13 @@ sceneManager.inherit(BaseSceneManager, {
     var x = -0.2 * (readersLength - 1) / 2;
     this.hud.maxScale = 0.07;
     this.hud.setPalette(name, 1000);
+    var self = this;
     _.each(node.children, function (target, tile_size) {
       target.position.set(0.2 * tile_size + x, 0, 0);
       target.scale.set(0, 0, 0);
-      target.tweenValue.scale = this.hud.maxScale;
+      target.tweenValue.scale = self.hud.maxScale;
       target.rotation.set(0, 0, 0);
-      this.scene.materials[target.material.uuid] = target.material;
+      self.scene.materials[target.material.uuid] = target.material;
     }, this);
     node.position.set(0, -0.25, -0.6);
     node.rotation.set(0, 0, 0);
@@ -716,7 +726,7 @@ sceneManager.inherit(BaseSceneManager, {
     }
   },
   initCrosshair: function () {
-    this.crosshair = new SphereGeometryExtern();
+    this.crosshair = new BaseSphereGeometry();
     this.crosshair.fadeOut();
     this.camera.add(this.crosshair);
   },
@@ -725,21 +735,22 @@ sceneManager.inherit(BaseSceneManager, {
   },
   initFlares: function () {
     this.flares = [];
-    var t = this.interiorScene.getObjectByName('spots');
-    var PL$93 = LoaderUtils.getTexture('textures/flare.png');
-    if (t) {
-      t.children.forEach(function (camera) {
+    var spots = this.interiorScene.getObjectByName('spots');
+    var flareTexture = LoaderUtils.getTexture('textures/flare.png');
+    if (spots) {
+      spots.children.forEach(function (camera) {
         var material = new THREE.PointsMaterial({
           size: 1.5,
-          map: PL$93,
+          map: flareTexture,
           transparent: true,
           depthWrite: false,
           depthTest: false,
           blending: THREE.AdditiveBlending,
           opacity: 0.35
         });
-        var geometry = new THREE.Geometry();
+        let geometry = new THREE.Geometry();
         geometry.vertices.push(new THREE.Vector3());
+        geometry.morphAttributes = {};
         var mesh = new THREE.Points(geometry, material);
         camera.getWorldPosition(mesh.position);
         this.flares.push(mesh);

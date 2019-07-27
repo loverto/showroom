@@ -1,6 +1,12 @@
 #define MOBILE
 #define LUV
 
+// 设定float 精度
+precision highp float;
+precision highp int;
+precision lowp sampler2D;
+precision lowp samplerCube;
+
 uniform float uAOPBRFactor;
 uniform float uAlbedoPBRFactor;
 uniform float uEnvironmentExposure;

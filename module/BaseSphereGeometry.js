@@ -1,4 +1,6 @@
-var SphereGeometryExtern = function () {
+import * as THREE from 'three';
+
+var BaseSphereGeometry = function () {
   THREE.Mesh.call(this, new THREE.SphereGeometry(0.005, 25, 25), new THREE.MeshBasicMaterial({
     color: 16777215,
     opacity: 1,
@@ -12,7 +14,7 @@ var SphereGeometryExtern = function () {
     scale: 1
   };
 };
-SphereGeometryExtern.inherit(THREE.Mesh, {
+BaseSphereGeometry.inherit(THREE.Mesh, {
   fadeIn: function () {
     if (this.faded) {
       var x = this.values;
@@ -40,4 +42,4 @@ SphereGeometryExtern.inherit(THREE.Mesh, {
     }
   }
 });
-export default SphereGeometryExtern;
+export default BaseSphereGeometry;

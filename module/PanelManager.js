@@ -1,3 +1,5 @@
+import * as THREE  from 'three';
+
 import Event from 'module/Event';
 import Panel from 'module/Panel';
 import Palette from 'module/Palette';
@@ -26,22 +28,23 @@ PanelManager.prototype = {
   createPanels: function (scene, count, cmp) {
     var r = LoaderUtils.getTexture('textures/corner-gradient.png');
     this.panels = {};
+    var self = this;
     _.each(count, function (p) {
       var objTemplate = scene.getObjectByName('ui_panel').clone();
       var panel = new Panel({
         referenceObject: objTemplate,
         data: p.panel_data,
         hudSize: {
-          width: this.width,
-          height: this.height
+          width: self.width,
+          height: self.height
         },
         gradientMap: r,
         showGradient: !cmp
       });
-      this.scene.add(panel);
+      self.scene.add(panel);
       panel.visible = false;
-      this.panels[p.name] = panel;
-    }, this);
+      self.panels[p.name] = panel;
+    });
   },
   createPalettes: function (g, e, islongclick) {
     e.forEach(function (_ref33) {

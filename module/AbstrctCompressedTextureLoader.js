@@ -1,3 +1,5 @@
+import * as THREE  from 'three';
+
 function findErrorByList(t, data, array) {
   var d = t * t;
   var x = 2 * t * t;
@@ -11,13 +13,13 @@ function findErrorByList(t, data, array) {
     array[item++] = data[i + index];
   }
 }
-var CompressedTextureLoaderExtern = function (size, options, manager) {
-  this.manager = void 0 !== manager ? manager : THREE.DefaultLoadingManager;
+var AbstrctCompressedTextureLoader = function (size, options, manager) {
+  this.manager = undefined !== manager ? manager : THREE.DefaultLoadingManager;
   this._size = size;
   this._interleaved = options;
 };
-CompressedTextureLoaderExtern.prototype = Object.create(THREE.CompressedTextureLoader.prototype);
-CompressedTextureLoaderExtern.prototype._parser = function (buffer) {
+AbstrctCompressedTextureLoader.prototype = Object.create(THREE.CompressedTextureLoader.prototype);
+AbstrctCompressedTextureLoader.prototype._parser = function (buffer) {
   var e = [];
   var order = Math.log2(this._size);
   var dataOffset = 0;
@@ -62,4 +64,4 @@ CompressedTextureLoaderExtern.prototype._parser = function (buffer) {
 Math.log2 = Math.log2 || function (score) {
   return Math.log(score) * Math.LOG2E;
 };
-export default CompressedTextureLoaderExtern;
+export default AbstrctCompressedTextureLoader;

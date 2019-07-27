@@ -1,2 +1,2 @@
 import vs from 'module/glsl/PBRMaterialvs.glsl';
-export default '';
+export default vs.default;

@@ -1,5 +1,8 @@
+import * as THREE from 'three';
+
 import WaterMaterial from 'module/WaterMaterial';
 import LoaderUtils from 'module/LoaderUtils';
+
 function Water(options) {
   var waterNormals = LoaderUtils.getTexture('textures/waternormals.jpg');
   waterNormals.wrapS = waterNormals.wrapT = THREE.RepeatWrapping;
@@ -12,7 +15,7 @@ function Water(options) {
   this.effect = new WaterMaterial(options.renderer, options.camera, {
     color: 16777215,
     waterNormals: waterNormals,
-    transparent: void 0 !== options.transparent && options.transparent,
+    transparent: undefined !== options.transparent && options.transparent,
     sunDirection: trail,
     sunColor: 16777215,
     shininess: 500,

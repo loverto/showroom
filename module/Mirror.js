@@ -1,3 +1,5 @@
+import * as THREE from 'three';
+
 var mirrorShader = {
   uniforms: {
     color: { value: new THREE.Color(8355711) },
@@ -33,11 +35,11 @@ var Mirror = function (obj, camera, options) {
   this.name = 'mirror_' + this.id;
   options = options || {};
   this.matrixNeedsUpdate = true;
-  var width = void 0 !== options.textureWidth ? options.textureWidth : 512;
-  var height = void 0 !== options.textureHeight ? options.textureHeight : 512;
-  this.clipBias = void 0 !== options.clipBias ? options.clipBias : 0;
-  var _startingFret = void 0 !== options.color ? new THREE.Color(options.color) : new THREE.Color(8355711);
-  if (this.renderer = obj, this.mirrorPlane = new THREE.Plane(), this.normal = new THREE.Vector3(0, 0, 1), this.mirrorWorldPosition = new THREE.Vector3(), this.cameraWorldPosition = new THREE.Vector3(), this.rotationMatrix = new THREE.Matrix4(), this.lookAtPosition = new THREE.Vector3(0, 0, -1), this.clipPlane = new THREE.Vector4(), void 0 !== options.debugMode && options.debugMode) {
+  var width = undefined !== options.textureWidth ? options.textureWidth : 512;
+  var height = undefined !== options.textureHeight ? options.textureHeight : 512;
+  this.clipBias = undefined !== options.clipBias ? options.clipBias : 0;
+  var _startingFret = undefined !== options.color ? new THREE.Color(options.color) : new THREE.Color(8355711);
+  if (this.renderer = obj, this.mirrorPlane = new THREE.Plane(), this.normal = new THREE.Vector3(0, 0, 1), this.mirrorWorldPosition = new THREE.Vector3(), this.cameraWorldPosition = new THREE.Vector3(), this.rotationMatrix = new THREE.Matrix4(), this.lookAtPosition = new THREE.Vector3(0, 0, -1), this.clipPlane = new THREE.Vector4(), undefined !== options.debugMode && options.debugMode) {
     var leader = new THREE.ArrowHelper(new THREE.Vector3(0, 0, 1), new THREE.Vector3(0, 0, 0), 10, 16777088);
     var geometry = new THREE.Geometry();
     geometry.vertices.push(new THREE.Vector3(-10, -10, 0));
@@ -155,7 +157,7 @@ Mirror.prototype.render = function () {
   for (; null !== scene.parent;) {
     scene = scene.parent;
   }
-  if (void 0 !== scene && scene instanceof THREE.Scene) {
+  if (undefined !== scene && scene instanceof THREE.Scene) {
     var visible = this.material.visible;
     this.material.visible = false;
     this.renderer.render(scene, this.mirrorCamera, this.renderTarget, true);
@@ -171,7 +173,7 @@ Mirror.prototype.renderTemp = function () {
   for (; null !== scene.parent;) {
     scene = scene.parent;
   }
-  if (void 0 !== scene && scene instanceof THREE.Scene) {
+  if (undefined !== scene && scene instanceof THREE.Scene) {
     this.renderer.render(scene, this.mirrorCamera, this.renderTarget2, true);
   }
 };

@@ -1,49 +1,73 @@
+import * as THREE from 'three';
+
 import bluebird from 'bluebird';
-import 'module/MaterialLoaderExtern';
-import shape from 'module/LoaderUtils';
-var instance = (require('module/PBRMaterial'), require('module/LoadSceneManager'), {});
-instance.loadScene = function (value, name, options, data) {
-  return new bluebird(function (generateBuildHash, a) {
-    var addedRenderer = (options.renderer, shape.getGeometry(value));
-    if (addedRenderer) {
-      shape.sceneLoader.setBinaryGeometryBuffer(addedRenderer);
-    }
-    shape.loadScene(name + value + (data || '.json')).spread(function (self, exports) {
-      var camera;
-      self.materials = {};
-      if (self.cameras && self.cameras.length > 0) {
-        camera = self.cameras[0];
-      }
-      if (camera) {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-      } else {
-        camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.01, 2000);
-        camera.position.set(-3.5, 2, 3);
-      }
-      self.traverse(function (object) {
-        if (object.material) {
-          if (object.material.materials) {
-            object.material.materials.forEach(function (b) {
-              self.materials[b.uuid] = b;
+import 'module/BaseMaterialLoader';
+import loaderUtils from 'module/LoaderUtils';
+import 'module/PBRMaterial'
+import 'module/LoadSceneManager'
+var instance = {};
+
+/**
+ * 加载场景
+ * @param name
+ * @param data 数据或资源路径
+ * @param scene
+ * @param callback
+ * @returns {Promise}
+ */
+instance.loadScene = function(name, data, scene, callback) {
+    return new bluebird(function(resolve, reject) {
+        // options.renderer
+        var binaryGeometryBuffer = loaderUtils.getGeometry(name);
+        // 设置二进制几何Buffer
+        if (binaryGeometryBuffer) {
+            console.log("设置二进制几何Buffer")
+            loaderUtils.sceneLoader.setBinaryGeometryBuffer(binaryGeometryBuffer);
+        }
+        // 加载场景
+        loaderUtils.loadScene(data + name + (callback || '.json')).spread(function(sceneParm, json) {
+            // 声明相机
+            var camera;
+            // 置空物料信息
+            sceneParm.materials = {};
+            // 如果有相机，则获取相机
+            if (sceneParm.cameras && sceneParm.cameras.length > 0) {
+                camera = sceneParm.cameras[0];
+            }
+            // 设置相机的面为当前计算机可视区域的宽/除以可视区域的高
+            if (camera) {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                // 更新投影矩阵
+                camera.updateProjectionMatrix();
+            } else {
+                // 如果没有创建相机的话，新创建一个透视相机，设置相应的参数，和相机的位置
+                camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, .01, 2E3);
+                camera.position.set(-3.5, 2, 3);
+            }
+            // 横过
+            sceneParm.traverse(function(camera) {
+                if (camera instanceof THREE.DirectionalLight) {
+                    camera.position.set(0, 0, 1);
+                    camera.quaternion.normalize();
+                    camera.position.applyQuaternion(camera.quaternion);
+                    camera.quaternion.set(0, 0, 0, 0);
+                    camera.scale.set(0, 0, 0);
+                }
+                if (camera.material) {
+                    if (camera.material.materials) {
+                        camera.material.materials.forEach(function (material) {
+                            sceneParm.materials[material.uuid] = material;
+                        });
+                    } else {
+                        sceneParm.materials[camera.material.uuid] = camera.material;
+                    }
+                }
             });
-          } else {
-            self.materials[object.material.uuid] = object.material;
-          }
-        }
-        if (object instanceof THREE.DirectionalLight) {
-          object.position.set(0, 0, 1);
-          object.quaternion.normalize();
-          object.position.applyQuaternion(object.quaternion);
-          object.quaternion.set(0, 0, 0, 0);
-          object.scale.set(0, 0, 0);
-        }
-      });
-      options.scene = self;
-      options.scenes.push(self);
-      options.camera = camera;
-      generateBuildHash(self);
+            scene.scene = sceneParm;
+            scene.scenes.push(sceneParm);
+            scene.camera = camera;
+            resolve(sceneParm);
+        });
     });
-  });
 };
 export default instance;

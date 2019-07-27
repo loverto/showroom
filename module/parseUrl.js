@@ -28,4 +28,4 @@ var replaceUndefined =  parseUrl.replaceUndefined = function(currentValue, index
   return undefined === currentValue || null === currentValue ? validUrl.isUri(arr[0]) ? '/' : path.sep : currentValue;
 };
 
-export {parseUrl};
+export default parseUrl;

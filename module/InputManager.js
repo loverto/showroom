@@ -16,17 +16,18 @@ InputManager.prototype = {
   },
   update: function () {
     this.poll();
+    var self = this;
     _.each(this.gamepads, function (sectionInfo) {
       if (sectionInfo) {
         var k = 0;
         for (; k < sectionInfo.buttons.length; k++) {
           var input = sectionInfo.buttons[k];
           if (input.pressed) {
-            this.buttonPressed = k;
+            self.buttonPressed = k;
           } else {
-            if (null != this.buttonPressed && this.buttonPressed === k) {
+            if (null != self.buttonPressed && self.buttonPressed === k) {
               this.trigger('press');
-              this.buttonPressed = null;
+              self.buttonPressed = null;
             }
           }
         }
