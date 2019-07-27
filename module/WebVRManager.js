@@ -247,7 +247,9 @@ var WebVRManager = function (renderer, e) {
       }
       return renderTarget ? (renderTarget.viewport.set(renderRectL.x, renderRectL.y, renderRectL.width, renderRectL.height), renderTarget.scissor.set(renderRectL.x, renderRectL.y, renderRectL.width, renderRectL.height)) : (renderer.setViewport(renderRectL.x, renderRectL.y, renderRectL.width, renderRectL.height), renderer.setScissor(renderRectL.x, renderRectL.y, renderRectL.width, renderRectL.height)), renderer.render(scene, cameraR, renderTarget, forceClear), renderTarget ? (renderTarget.viewport.set(renderRectR.x, renderRectR.y, renderRectR.width, renderRectR.height), renderTarget.scissor.set(renderRectR.x, renderRectR.y, renderRectR.width, renderRectR.height)) : (renderer.setViewport(renderRectR.x, renderRectR.y, renderRectR.width, renderRectR.height), renderer.setScissor(renderRectR.x, renderRectR.y, renderRectR.width, renderRectR.height)), renderer.render(scene, obj, renderTarget, forceClear), renderTarget ? (renderTarget.viewport.set(0, 0, size.width, size.height), renderTarget.scissor.set(0, 0, size.width, size.height), renderTarget.scissorTest = false, renderer.setRenderTarget(null)) : (renderer.setViewport(0, 0, size.width, size.height), renderer.setScissorTest(false)), currentSceneAutoUpdate && (scene.autoUpdate = true), void (scope.autoSubmitFrame && scope.submitFrame());
     }
-    renderer.render(scene, camera, renderTarget, forceClear);
+    renderer.render(scene, camera);
+    renderer.setRenderTarget(renderTarget)
+    renderer.clear();
   };
   this.dispose = function () {
     window.removeEventListener('vrdisplaypresentchange', onVRDisplayPresentChange, false);

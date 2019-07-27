@@ -111,7 +111,7 @@ BaseSceneManager.prototype = {
     }
     var self = this;
     _.each(this.scenes, function (child) {
-      this.updateCustomMaterials(child);
+      self.updateCustomMaterials(child);
       if (child.update) {
         child.updateMatrixWorld(true);
         child.update(self.renderer, time);

@@ -30,7 +30,7 @@ function r(context, f) {
   return folderPathClone;
 }
 function isString(object) {
-  return _.contains(_.map(Configurables, function (engineDiscovery) {
+  return _.includes(_.map(Configurables, function (engineDiscovery) {
     return engineDiscovery.name;
   }), object.name);
 }

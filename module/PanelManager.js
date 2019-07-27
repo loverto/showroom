@@ -158,7 +158,7 @@ PanelManager.prototype = {
     };
     return function (options) {
       if (!options.current) {
-        if (_.contains(this.currentPalette.children, options)) {
+        if (_.includes(this.currentPalette.children, options)) {
           this.trigger('selectMaterial', this.currentPalette.children.indexOf(options));
         }
         oRoster.reset(from).to({

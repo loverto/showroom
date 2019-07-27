@@ -53,6 +53,7 @@ ScenePicker.prototype = {
     new THREE.Vector3();
     return function (vr) {
       var name;
+      var self = this;
       this.camera.getWorldPosition(node);
       if (this.vr || vr) {
         this.camera.getWorldDirection(camera);
@@ -63,7 +64,7 @@ ScenePicker.prototype = {
       var template = raycaster.intersectObjects(this.objects);
       if (template.length > 0) {
         var options = _.find(template, function (typeStatement) {
-          return this.checkFlag ? undefined !== typeStatement.object.pickable && true === typeStatement.object.pickable : typeStatement.object;
+          return self.checkFlag ? undefined !== typeStatement.object.pickable && true === typeStatement.object.pickable : typeStatement.object;
         }, this);
         if (options) {
           this.point = options.point;

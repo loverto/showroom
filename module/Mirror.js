@@ -142,7 +142,9 @@ Mirror.prototype.render = function () {
   if (undefined !== scene && scene instanceof THREE.Scene) {
     var visible = this.material.visible;
     this.material.visible = false;
-    this.renderer.render(scene, this.mirrorCamera, this.renderTarget, true);
+    this.renderer.render(scene, this.mirrorCamera);
+    this.renderer.setRenderTarget(this.renderTarget);
+    this.renderer.clear();
     this.material.visible = visible;
   }
 };
@@ -156,7 +158,9 @@ Mirror.prototype.renderTemp = function () {
     scene = scene.parent;
   }
   if (undefined !== scene && scene instanceof THREE.Scene) {
-    this.renderer.render(scene, this.mirrorCamera, this.renderTarget2, true);
+    this.renderer.render(scene, this.mirrorCamera);
+    this.renderer.setRenderTarget(this.renderTarget2)
+    this.renderer.clear();
   }
 };
 export default Mirror;

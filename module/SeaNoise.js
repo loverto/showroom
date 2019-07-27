@@ -20,7 +20,8 @@ var SeaNoise = function () {
 };
 SeaNoise.prototype = {
   render: function (renderer) {
-    renderer.render(this.scene, this.camera, this.target);
+    renderer.render(this.scene, this.camera);
+    renderer.setRenderTarget(this.target)
   }
 };
 export default SeaNoise;

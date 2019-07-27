@@ -209,6 +209,7 @@ $('document').ready(function () {
         }
     });
     start2.on('tap', function () {
+        debugger;
         if (!N) {
             N = true;
             if (VRenabled || window.isMobile) {
