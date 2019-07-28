@@ -47,14 +47,15 @@ function toggleCart() {
 /**
  * 加载图片
  * @param url
- * @param crossOrigin
- * @param deferred
+ * @param width
+ * @param height
  */
-function loadImage(url, crossOrigin, deferred) {
-    var r = ($(window).width() - crossOrigin) / 2;
-    var i = ($(window).height() - deferred) / 2;
-    var link_options = 'status=1,width=' + crossOrigin + ',height=' + deferred + ',top=' + i + ',left=' + r;
-    return window.open(url, 'share', link_options), false;
+function loadImage(url, width, height) {
+    var left = ($(window).width() - width) / 2;
+    var top = ($(window).height() - height) / 2;
+    var link_options = 'status=1,width=' + width + ',height=' + height + ',top=' + top + ',left=' + left;
+    window.open(url, 'share', link_options);
+    return false;
 }
 
 /**
@@ -150,21 +151,37 @@ function initialize() {
         }
     });
 }
+
+/**
+ * 开始启动
+ */
 function start() {
+    // vr可用，场景进入vr
     if (vrabled) {
         scene.enterVR();
     }
+    // 场景开始
     scene.start();
+    // 隐藏线
     border.hide();
+    // 正在加载添加已经启动
     loading.addClass('started');
+    // 面板容器中加上关于和进入app
     panelContainer.addClass('state-about in-app');
+    // 面板移除隐藏
     panel.removeClass('hidden');
+    // 如果不是移动设备，面板显示
     if (!window.isMobile) {
+        // 面板显示
         panel.show();
     }
+    // 触发窗口重置
     $(window).trigger('resize');
+    // 关于按钮，
     aboutButton.addClass('visible');
+    // 设置定时操作
     setTimeout(function () {
+        // 移除加载北京元素
         lodingAndBackground.remove();
     }, 200);
 }

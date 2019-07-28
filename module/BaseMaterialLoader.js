@@ -21,7 +21,17 @@ THREE.MaterialLoader.prototype.parse = function(options) {
     var json =null;
         options.color = undefined;
     if (options.type === 'MultiMaterial'){
-        json = THREEObjectLoaderparsers.call(this,options);
+        debugger
+        //THREE.MultiMaterial.
+        var maters = [];
+        for (var i = 0 ; i < options.materials.length;i++){
+            var materia = this.parse(this,options.materials[i])
+            maters.push(materia)
+        }
+        var multiMaterial = new THREE.MultiMaterial(maters);
+        multiMaterial.name = options.name;
+        multiMaterial.uuid = options.uuid;
+        //json = THREEObjectLoaderparsers.call(this,options);
     } else {
         // 首先调用MateriaLoader的parse方法转换参数
         json = THREEMateriaLoaderparse.call(this, options);

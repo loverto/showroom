@@ -104,6 +104,7 @@ sceneManager.inherit(BaseSceneManager, {
     if (Config.DEBUG_KEYS) {
       this.initDebugKeyEvents();
     }
+    // 根据模式创建操作事件
     if (this.mode === sceneManager.VR_MODE) {
       this.initInstructions();
       this.initInputManager();
@@ -259,15 +260,22 @@ sceneManager.inherit(BaseSceneManager, {
   initInputManager: function () {
     this.inputManager = new InputManager();
   },
+  /**
+   * 开始
+   */
   start: function () {
+    // 相机启动控制
     this.camera.enableControls();
+    //
     if (this.mode !== sceneManager.DEFAULT_MODE || window.isMobile) {
       if (this.mode === sceneManager.DEFAULT_MODE && window.isMobile) {
         this.ui.showMoveInstructions();
       }
     } else {
+      // 显示查看说明
       this.ui.showLookInstructions();
     }
+    // 调用父类开始方法
     BaseSceneManager.prototype.start.call(this);
   },
   enterVR: function () {
@@ -295,11 +303,17 @@ sceneManager.inherit(BaseSceneManager, {
       }
     }.bind(this));
   },
+  /**
+   * 处理米有VR的事件
+   */
   handleNonVREvents: function () {
     var _takingTooLongTimeout = null;
     return function () {
+      // 非移动设备
       if (!window.isMobile) {
+        // 注册鼠标移动事件
         $('canvas').on('mousemove', function (expr) {
+
           var value = negate(expr, this.containerOffset, this.containerWidth, this.containerHeight);
           this.scenePicker.updateMouseCoords(value);
           this.hudPicker.updateMouseCoords(value);
