@@ -93,37 +93,57 @@ sceneManager.inherit(BaseSceneManager, {
     this.initUI();
     // 初始化可挑选对象
     this.initObjectPickers();
+    //init对象渲染顺序
     this.initObjectsRenderOrder();
+    // 初始材料曝光
     this.initMaterialsExposure();
+    //init池
     this.initPool();
+    // init Sea亮点
     this.initSeaHighlights();
+    //init Flares
     this.initFlares();
+    // init 定向光
     this.initDirLight();
+    // init 悬停场景
     this.initHoverScene();
+    // init相机场景
     this.initCameraScene();
     if (Config.DEBUG_KEYS) {
+      // 初始化调试事件
       this.initDebugKeyEvents();
     }
     // 根据模式创建操作事件
     if (this.mode === sceneManager.VR_MODE) {
+      // 初始化说明
       this.initInstructions();
+      // 初始化输入管理
       this.initInputManager();
+      // 处理VR事件
       this.handleVREvents();
+      // 初始化十字线
       this.initCrosshair();
+      // init过渡场景
       this.initTransitionScene();
     } else {
       if (this.mode === sceneManager.DEFAULT_MODE) {
+        // 初始化没有VR事件
         this.handleNonVREvents();
       }
     }
     if (this.config.fps) {
+      // 初始化FPS计数器
       this.initFPSCounter();
     }
     if (this.config.logCalls) {
+      // 初始化绘制调用次数
       this.initDrawCallsCounter();
     }
+    // 初始化皮肤事件
     this.handleHudEvents();
+    // 厨师刷相机事件
     this.handleCameraEvents();
+    // 触发窗口重置事件
     $(window).trigger('resize');
     _.defer(this.preRenderHUD.bind(this));
   },
@@ -731,57 +751,71 @@ sceneManager.inherit(BaseSceneManager, {
     option.previousParent.add(option);
     option.position.copy(option.previousPosition);
   },
+  /**
+   * init对象渲染顺序
+   */
   initObjectsRenderOrder: function () {
-    var _object = this.interiorScene.getObjectByName('glassrail');
-    if (_object) {
-      _object.renderOrder = 50;
+    // 玻璃扶手
+    var glassrail = this.interiorScene.getObjectByName('glassrail');
+    if (glassrail) {
+      glassrail.renderOrder = 50;
     }
-    var _line = this.interiorScene.getObjectByName('glasses');
-    if (_line) {
-      _line.renderOrder = 100;
+    // 眼镜
+    var glasses = this.interiorScene.getObjectByName('glasses');
+    if (glasses) {
+      glasses.renderOrder = 100;
     }
-    var _face = this.interiorScene.getObjectByName('sea');
-    if (_face) {
-      _face.renderOrder = 100;
+    // 大海
+    var sea = this.interiorScene.getObjectByName('sea');
+    if (sea) {
+      sea.renderOrder = 100;
     }
-    var mesh = this.interiorScene.getObjectByName('sky');
-    if (mesh) {
-      mesh.renderOrder = 95;
-      mesh.visible = true;
+    // 天空
+    var sky = this.interiorScene.getObjectByName('sky');
+    if (sky) {
+      sky.renderOrder = 95;
+      sky.visible = true;
     }
-    var partial_tree = this.interiorScene.getObjectByName('clouds');
-    if (partial_tree) {
-      partial_tree.traverse(function (a) {
-        a.renderOrder = 98;
+    // 云
+    var clouds = this.interiorScene.getObjectByName('clouds');
+    if (clouds) {
+      clouds.traverse(function (cloud) {
+        cloud.renderOrder = 98;
       });
     }
-    var node_res = this.interiorScene.getObjectByName('sun');
-    if (node_res) {
-      node_res.traverse(function (a) {
+    // 阳光
+    var sun = this.interiorScene.getObjectByName('sun');
+    if (sun) {
+      sun.traverse(function (a) {
         a.renderOrder = 97;
       });
     }
-    var a = this.interiorScene.getObjectByName('sun_and_clouds_merged');
-    if (a) {
-      a.renderOrder = 97;
+    // 合并的太阳和云
+    var sun_and_clouds_merged = this.interiorScene.getObjectByName('sun_and_clouds_merged');
+    if (sun_and_clouds_merged) {
+      sun_and_clouds_merged.renderOrder = 97;
     }
-    var object = this.interiorScene.getObjectByName('sea_highlight');
-    if (object) {
-      object.renderOrder = 101;
+    // 海高度
+    var sea_highlight = this.interiorScene.getObjectByName('sea_highlight');
+    if (sea_highlight) {
+      sea_highlight.renderOrder = 101;
     }
-    var exTree = this.interiorScene.getObjectByName('islands');
-    if (exTree) {
-      exTree.traverse(function (a) {
-        a.renderOrder = 102;
+    //陆地
+    var islands = this.interiorScene.getObjectByName('islands');
+    if (islands) {
+      islands.traverse(function (island) {
+        island.renderOrder = 102;
       });
     }
-    var b = this.interiorScene.getObjectByName('islands_merged');
-    if (b) {
-      b.renderOrder = 102;
+    //陆地合并
+    var islands_merged = this.interiorScene.getObjectByName('islands_merged');
+    if (islands_merged) {
+      islands_merged.renderOrder = 102;
     }
-    var _sprite = this.interiorScene.getObjectByName('sea_highlights2');
-    if (_sprite) {
-      _sprite.renderOrder = 103;
+    // 海高度2
+    var sea_highlights2 = this.interiorScene.getObjectByName('sea_highlights2');
+    if (sea_highlights2) {
+      sea_highlights2.renderOrder = 103;
     }
   },
   initCrosshair: function () {
@@ -789,7 +823,11 @@ sceneManager.inherit(BaseSceneManager, {
     this.crosshair.fadeOut();
     this.camera.add(this.crosshair);
   },
+  /**
+   * 初始化材料曝光
+   */
   initMaterialsExposure: function () {
+    //英尺
     this.scene.getObjectByName('feet').material.exposure = 0.3;
   },
   initFlares: function () {
@@ -817,7 +855,11 @@ sceneManager.inherit(BaseSceneManager, {
       }, this);
     }
   },
+  /**
+   * 初始化水池
+   */
   initPool: function () {
+    // 水
     this.water = new Water({
       light: this.scene.getObjectByName('ocean light'),
       camera: this.camera,
@@ -826,21 +868,31 @@ sceneManager.inherit(BaseSceneManager, {
       transparent: true,
       opacity: 0.6
     });
+    // 池水
     this.exteriorScene.getObjectByName('pool_water').visible = false;
+    // 添加水到外场景
     this.exteriorScene.add(this.water);
   },
+  /**
+   * 初始化海的高亮部分
+   */
   initSeaHighlights: function () {
-    var self = this.interiorScene.getObjectByName('sea_highlights2');
-    var m = self.material;
-    var map = m.map;
+    //
+    var sea_highlights2 = this.interiorScene.getObjectByName('sea_highlights2');
+    var material = sea_highlights2.material;
+    var map = material.map;
     this.noise = new SeaNoise();
-    self.material = new SeaMaterial();
-    self.material.map = map;
-    self.material.uniforms.offsetRepeat.value.set(map.offset.x, map.offset.y, map.repeat.x, map.repeat.y);
-    self.material.transparent = m.transparent;
-    self.material.noiseMap = this.noise.target.texture;
-    this.seaHighlights = self;
+    sea_highlights2.material = new SeaMaterial();
+    sea_highlights2.material.map = map;
+    sea_highlights2.material.uniforms.offsetRepeat.value.set(map.offset.x, map.offset.y, map.repeat.x, map.repeat.y);
+    sea_highlights2.material.transparent = material.transparent;
+    sea_highlights2.material.noiseMap = this.noise.target.texture;
+    this.seaHighlights = sea_highlights2;
   },
+  /**
+   * 更新海高亮部分
+   * @param writeBuffer
+   */
   updateSeaHighlights: function (writeBuffer) {
     this.seaHighlights.material.updateUniforms(writeBuffer);
   },
